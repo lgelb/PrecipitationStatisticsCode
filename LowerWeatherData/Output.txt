@@ -1,0 +1,1 @@
+Done! mustormlength = 1.87 days (44.78 hours), mustormdepth = 8.37 mm, muinterstorm = 6.17 days (44.78 hours), mustormsperyear = 44.79

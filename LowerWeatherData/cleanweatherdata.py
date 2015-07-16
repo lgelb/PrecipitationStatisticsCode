@@ -12,11 +12,13 @@
 
 from numpy import loadtxt
 import numpy
-import csv
+#import csv
 
 stormlength=[]
 stormdepth=[]
 interstorm=[]
+
+
 preciptocountasastorm=0.5 #precim is in mm
 alltimeprecip=[]
 stormcount=0 #this is to count total number of storms, to get num storms/yr
@@ -92,4 +94,9 @@ mustormsperyear = stormcount/14.0 #total number of storms divided by years
 #line = fo.writelines( str(interstorm) )
 #fo.close()
 
-print "Done! mustormlength = %f, mustormdepth = %f, muinterstorm = %f, mustormsperyear = %f" % (mustormlength,mustormdepth,muinterstorm,mustormsperyear)
+out = "Done! mustormlength = %.2f days (%.2f hours), mustormdepth = %.2f mm, muinterstorm = %.2f days (%.2f hours), mustormsperyear = %.2f" % (mustormlength, (mustormlength*24),mustormdepth,muinterstorm, (mustormlength*24),mustormsperyear)
+
+with open("Output.txt", "w") as text_file:
+    text_file.write(out)
+
+print out
