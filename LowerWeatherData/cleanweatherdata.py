@@ -100,3 +100,13 @@ with open("Output.txt", "w") as text_file:
     text_file.write(out)
 
 print out
+
+"""
+    numdays= (len(precipHourly))/24 #finds number of days/year
+    if numdays > 365: #(leap years)
+        leapyear=True
+    else:
+        leapyear=False
+    numdays= (len(precipHourly))/24
+"""
+dd
