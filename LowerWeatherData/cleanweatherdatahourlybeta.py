@@ -10,6 +10,7 @@ major flaw: this code does not deal with storms overlapping seasons
 
 from numpy import loadtxt
 import numpy
+from tabulate import tabulate
 
 w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0;d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 
@@ -85,8 +86,9 @@ for n in range(startyear,endyear): #years 1999-2013, because exclusive
                     d_stormlength.append(templength)
                     templength=0
                     tempdepth=0
-                    
-                    
+
+mustormsperyear = (w_stormcount+d_stormcount)/(endyear-startyear) #total number of storms divided by years
+
 w_mustormlength = numpy.mean(w_stormlength)
 w_mustormdepth = numpy.mean(w_stormdepth)
 w_muinterstorm = numpy.mean(w_interstorm)
@@ -99,12 +101,13 @@ y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
 y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 
-mustormsperyear = (w_stormcount+d_stormcount)/(endyear-startyear) #total number of storms divided by years
-            
-out = "Done! mustormlength = %.2f hours, mustormdepth = %.2f mm, muinterstorm = %.2f hours, mustormsperyear = %.2f" % (mustormlength,mustormdepth,muinterstorm,mustormsperyear)
+t=[["wet year",w_mustormlength,w_mustormdepth,w_muinterstorm],["dry year",d_mustormlength,d_mustormdepth,d_muinterstorm],["year average",y_mustormlength,y_mustormdepth,y_muinterstorm]]
+h=[" ","storm (hours)","interstorm (hours)","depth (mm)"]
+         
+print tabulate(t,h)
 
-with open("Output.txt", "w") as text_file:
-    text_file.write(out)
+#with open("Output.txt", "w") as text_file:
+#    text_file.write(out)
 
-print out        
+#print out        
         
