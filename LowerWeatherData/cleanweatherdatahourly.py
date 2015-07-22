@@ -21,40 +21,49 @@ major flaw: this code does not deal with storms overlapping seasons
 from numpy import loadtxt
 import numpy
 from tabulate import tabulate
+import matplotlib.pyplot as plt
 
 w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0;d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 
-stormthreshold=0.01 #precim is in mm (0.5 was used as the daily threshold)
+stormthreshold=1 #precim is in mm (0.5 was used as the daily threshold)
 startyear=1999
-endyear=2013
+endyear=2013#exclusive, so it's really ending on 2012
+numyears=endyear-startyear
 
-for n in range(startyear,endyear): #years 1999-2013, because exclusive
-    print "Calculating %i..." % (n)
+cm = plt.get_cmap('winter')
+plt.figure()
+plt.xlabel("day in year")
+plt.ylabel("precip in mm")
+ax = plt.subplot(111)
+ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
+
+for n in range(startyear,endyear): #years 1999-2013, because exclusive    
     filename = "%i.txt" % (n)
-    #loads in the hourly precip data
-    precipHourly = loadtxt(filename, comments="#", delimiter="    ", unpack=False) 
-    
-    #defines wet and dry seson
-    quarteryear = len(precipHourly)/4    
+    precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
+    begSummer=4000
+    endSummer=5500
+    print "Calculating %i..." % (n)
 
     #initialize temporary variables
     templength=0
     tempdepth=0
     tempinterstorm=0
     
+    ax.plot(precipHourly, label=n)
+    
     #actual counting of storm descriptors here
     for i in range(len(precipHourly)): #len = 8760, range is 0-8759
     
-        if i<quarteryear or i>(quarteryear*3): #wetseason        
+        if i<begSummer or i>(endSummer): #wetseason        
             #if it's not raining, add to interstorm
-            if (precipHourly[i]-precipHourly[(i-1)])==0 or i==0: #preciptocountasastorm or i==0:
+            if (precipHourly[i]-precipHourly[(i-1)])<stormthreshold or i==0: #preciptocountasastorm or i==0:
                 tempinterstorm+=1
             #if it is raining, it is a storm. What kind?
             else:
                 templength+=1 #add one hour to the storm length
                 tempdepth+=(precipHourly[i]-precipHourly[(i-1)]) #top up rain depth/storm
                 #if it wasn't raining last hour, a storm is begining
-                if precipHourly[(i-1)] -precipHourly[(i-2)]<=0: 
+                if precipHourly[(i-1)] -precipHourly[(i-2)]<stormthreshold: 
                     w_interstorm.append(tempinterstorm)
                     tempinterstorm=0 #ends the interstorm duration, and clears it for next time
                     w_stormcount+=1
@@ -65,7 +74,7 @@ for n in range(startyear,endyear): #years 1999-2013, because exclusive
                     templength=0
                     tempdepth=0      
                 #if it isn't raining next hour, a storm is ending
-                elif precipHourly[(i+1)] -precipHourly[(i)]==0:
+                elif precipHourly[(i+1)] -precipHourly[(i)]<stormthreshold:
                     w_stormdepth.append(tempdepth)
                     w_stormlength.append(templength)
                     templength=0
@@ -73,14 +82,14 @@ for n in range(startyear,endyear): #years 1999-2013, because exclusive
             
         else: #dry season
         #if it's not raining, add to interstorm
-            if (precipHourly[i]-precipHourly[(i-1)])==0 or i==0: #preciptocountasastorm or i==0:
+            if (precipHourly[i]-precipHourly[(i-1)])<stormthreshold or i==0: #preciptocountasastorm or i==0:
                 tempinterstorm+=1
             #if it is raining, it is a storm. What kind?
             else:
                 templength+=1 #add one hour to the storm length
                 tempdepth+=(precipHourly[i]-precipHourly[(i-1)]) #top up rain depth/storm
                 #if it wasn't raining last hour, a storm is begining
-                if precipHourly[(i-1)] -precipHourly[(i-2)]<=0: 
+                if precipHourly[(i-1)] -precipHourly[(i-2)]<stormthreshold: 
                     d_interstorm.append(tempinterstorm)
                     tempinterstorm=0 #ends the interstorm duration, and clears it for next time
                     d_stormcount+=1
@@ -91,14 +100,22 @@ for n in range(startyear,endyear): #years 1999-2013, because exclusive
                     templength=0
                     tempdepth=0      
                 #if it isn't raining next hour, a storm is ending
-                elif precipHourly[(i+1)] -precipHourly[(i)]==0:
+                elif precipHourly[(i+1)] -precipHourly[(i)]<stormthreshold:
                     d_stormdepth.append(tempdepth)
                     d_stormlength.append(templength)
                     templength=0
                     tempdepth=0
 
-mustormsperyear = (w_stormcount+d_stormcount)/(endyear-startyear) #total number of storms divided by years
 
+
+
+# Shrink current axis by 20%
+box = ax.get_position()
+ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+# Put a legend to the right of the current axis
+ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+mustormsperyear = (w_stormcount+d_stormcount)/(numyears) #total number of storms divided by years
 w_mustormlength = numpy.mean(w_stormlength)
 w_mustormdepth = numpy.mean(w_stormdepth)
 w_muinterstorm = numpy.mean(w_interstorm)
@@ -111,7 +128,7 @@ y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
 y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 
-t=[["wet year","{0:.2f}".format(w_mustormlength),"{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_muinterstorm)],["dry year","{0:.2f}".format(d_mustormlength),"{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_muinterstorm)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_muinterstorm)]]
+t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}".format(w_muinterstorm),"{0:.2f}".format(w_mustormdepth)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}".format(d_muinterstorm),"{0:.2f}".format(d_mustormdepth)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}".format(y_muinterstorm),"{0:.2f}".format(y_mustormdepth)]]
 h=[" ","storm (hours)","interstorm (hours)","depth (mm)"]
          
 out= tabulate(t,h)
