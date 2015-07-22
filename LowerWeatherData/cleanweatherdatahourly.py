@@ -115,30 +115,30 @@ ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 # Put a legend to the right of the current axis
 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-mustormsperyear = (w_stormcount+d_stormcount)/(numyears) #total number of storms divided by years
+
 w_mustormlength = numpy.mean(w_stormlength)
 w_mustormdepth = numpy.mean(w_stormdepth)
 w_muinterstorm = numpy.mean(w_interstorm)
+w_mustormcount = w_stormcount/numyears
 
 d_mustormlength = numpy.mean(d_stormlength)
 d_mustormdepth = numpy.mean(d_stormdepth)
 d_muinterstorm = numpy.mean(d_interstorm)
+d_mustormcount = d_stormcount/numyears
 
 
 y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
 y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
+y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
-t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth)]]
-h=[" ","storm (hrs)","interstorm (hrs/days)","depth (mm)"]
+t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_mustormcount)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_mustormcount)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_mustormcount)]]
+h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
          
 out= tabulate(t,h)
 
 with open("Output.txt", "w") as text_file:
     text_file.write(out)
-    text_file.write('\n \n')
-    text_file.write("average number of storms per year: {0:.2f}".format(mustormsperyear))
 
-print out
-print "\naverage number of storms per year: {0:.2f}".format(mustormsperyear)        
+print out    
         

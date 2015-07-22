@@ -1,7 +1,5 @@
-                storm (hrs)  interstorm (hrs/days)      depth (mm)
-------------  -------------  -----------------------  ------------
-wet season             1.87  104.47/4.35                      3.42
-dry season             1.57  475.22/19.80                     3.69
-year average           1.85  128.44/5.35                      3.44
- 
-average number of storms per year: 66.00
+                S (hrs)  IS (hrs/days)      D (mm)    num S
+------------  ---------  ---------------  --------  -------
+wet season         1.87  104.47/4.35          3.42       62
+dry season         1.57  475.22/19.80         3.69        4
+year average       1.85  128.44/5.35          3.44       66
