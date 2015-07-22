@@ -29,6 +29,8 @@ stormthreshold=1 #precim is in mm (0.5 was used as the daily threshold)
 startyear=1999
 endyear=2013#exclusive, so it's really ending on 2012
 numyears=endyear-startyear
+begSummer=4000
+endSummer=6500
 
 cm = plt.get_cmap('winter')
 plt.figure()
@@ -40,8 +42,6 @@ ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
 for n in range(startyear,endyear): #years 1999-2013, because exclusive    
     filename = "%i.txt" % (n)
     precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
-    begSummer=4000
-    endSummer=5500
     print "Calculating %i..." % (n)
 
     #initialize temporary variables
@@ -124,12 +124,13 @@ d_mustormlength = numpy.mean(d_stormlength)
 d_mustormdepth = numpy.mean(d_stormdepth)
 d_muinterstorm = numpy.mean(d_interstorm)
 
+
 y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
 y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 
-t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}".format(w_muinterstorm),"{0:.2f}".format(w_mustormdepth)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}".format(d_muinterstorm),"{0:.2f}".format(d_mustormdepth)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}".format(y_muinterstorm),"{0:.2f}".format(y_mustormdepth)]]
-h=[" ","storm (hours)","interstorm (hours)","depth (mm)"]
+t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth)]]
+h=[" ","storm (hrs)","interstorm (hrs/days)","depth (mm)"]
          
 out= tabulate(t,h)
 
@@ -139,5 +140,5 @@ with open("Output.txt", "w") as text_file:
     text_file.write("average number of storms per year: {0:.2f}".format(mustormsperyear))
 
 print out
-print "average number of storms per year: {0:.2f}".format(mustormsperyear)        
+print "\naverage number of storms per year: {0:.2f}".format(mustormsperyear)        
         
