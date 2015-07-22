@@ -1,1 +1,7 @@
-Done! mustormlength = 3.14 hours, mustormdepth = 1.23 mm, muinterstorm = 24.11 hours, mustormsperyear = 321.00
+                storm (hours)    interstorm (hours)    depth (mm)
+------------  ---------------  --------------------  ------------
+wet year                 3.29                  1.27         17.97
+dry year                 2.85                  1.16         36.12
+year average             3.14                  1.23         24.11
+ 
+average number of storms per year: 321.00
