@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Jul 27 15:56:35 2015
+
+@author: lucyB570
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu Jul 16 16:01:38 2015
 this is an adaptation of the clean weather data code that should
 calculate storm statistics on an hourly and seasonal basis
 
 major flaw: this code does not deal with storms overlapping seasons
+cannot currently deal with missing data (-6999), manually ignore those years
 @author: lucyB570
 """
 
@@ -19,7 +27,7 @@ major flaw: this code does not deal with storms overlapping seasons
 """
 
 #from numpy import loadtxt
-import numpy, pandas
+import numpy, pandas,pylab
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 
@@ -27,7 +35,7 @@ w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
 d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 
 stormthreshold=1 #precim is in mm (0.5 was used as the daily threshold)
-startyear=2011
+startyear=2013
 endyear=2015#exclusive, so it's really ending on 2014
 numyears=endyear-startyear
 begSummer=4000
@@ -42,13 +50,13 @@ ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
 
 for n in range(startyear,endyear): #years 1999-2013, because exclusive    
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
-    print "Calculating %i..." % (n)
-    filename = "BRW_HrlySummary_%i.txt" % (n)
-    date_time = pandas.read_csv("BRW_HrlySummary_2014.csv", parse_dates=[0], \
+    filename = "BRW_HrlySummary_{}.csv".format(n)    
+    print "Calculating {}...".format(n)
+    date_time = pandas.read_csv(filename, parse_dates=[0], \
         header=None, usecols=[0],skiprows=20)
     (precipHourly,tempC,solarradiation,totalradiation,relativehumidity, \
         winddirectiondegree,windspeed,snowdepthcm)= \
-        numpy.loadtxt("BRW_HrlySummary_2014.csv",delimiter=",", \
+        numpy.loadtxt(filename,delimiter=",", \
         usecols=[1,2,3,4,5,6,7,8],skiprows=20,unpack=True)
     
     #initialize temporary variables
@@ -121,6 +129,7 @@ box = ax.get_position()
 ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 # Put a legend to the right of the current axis
 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+pylab.savefig('YealyPrecip.pdf', bbox_inches='tight')
 
 
 w_mustormlength = numpy.mean(w_stormlength)
@@ -145,6 +154,7 @@ h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
 out= tabulate(t,h)
 
 with open("Output.txt", "w") as text_file:
+    text_file.write("(Calculated using years {} to {}) \n \n".format(startyear,endyear))    
     text_file.write(out)
 
 print out    
