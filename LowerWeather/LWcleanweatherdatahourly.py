@@ -12,7 +12,7 @@ this is an adaptation of the clean weather data code that should
 calculate storm statistics on an hourly and seasonal basis
 
 major flaw: this code does not deal with storms overlapping seasons
-cannot currently deal with missing data (-6999), manually ignore those years
+
 some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day)
 not sure why, but I manually deleted these rows
 if you dont you get: "ValueError: could not convert string to float:"
