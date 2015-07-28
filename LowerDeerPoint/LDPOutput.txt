@@ -1,0 +1,7 @@
+(Calculated LDP averages using years 2008 to 2015) 
+ 
+                S (hrs)  IS (hrs/days)      D (mm)    num S
+------------  ---------  ---------------  --------  -------
+wet season         2.06  79.10/3.30           4.3        81
+dry season         2.42  355.15/14.80         5.22        5
+year average       2.08  97.29/4.05           4.36       86

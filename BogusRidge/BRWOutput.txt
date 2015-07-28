@@ -1,4 +1,4 @@
-(Calculated using years 2013 to 2015) 
+(Calculated BRW averages using years 2013 to 2015) 
  
                 S (hrs)  IS (hrs/days)      D (mm)    num S
 ------------  ---------  ---------------  --------  -------
