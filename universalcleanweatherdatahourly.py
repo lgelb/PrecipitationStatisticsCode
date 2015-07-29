@@ -11,28 +11,36 @@ Created on Thu Jul 16 16:01:38 2015
 this is an adaptation of the clean weather data code that should
 calculate storm statistics on an hourly and seasonal basis
 
-major flaw: this code does not deal with storms overlapping seasons
+to use:
+    1)change weather station name to correspond with correct site
+    2)run once to see the plot that shows when precip is occuring, then
+    3)adjust dry/wet seasons to correspond with correct 'begSummer'
+    and 'endSummer' variables. You may also have to omit a year if precip
+    data is not included for the calender year (common if a datalogger
+    was installed in the spring)
+    4)change txtfile.write to have correct notes in the output file
 
-some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day)
-not sure why, but I manually deleted these rows
-if you dont you get: "ValueError: could not convert string to float:"
+flaws:
+    -this code does not deal with storms overlapping seasons
+    -cannot currently deal with missing data (-6999), manually ignore those years
+    -some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day). Not sure why,
+    but I manually deleted these rows. If you don't, you get: "ValueError: could
+    not convert string to float:"
 
 @author: lucyB570
 """
 
 #from numpy import loadtxt
-import numpy, pandas,pylab
+import numpy,pandas,pylab,os
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 
 w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
 d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
-(precipHourly,tempC,solarradiation,totalradiation,relativehumidity, \
-        winddirectiondegree,windspeed,snowdepthcm)=([] for i in range(8))
 
-weatherstation='LowerWeather'
-startyear=1999
-endyear=2014
+weatherstation="SCR"
+startyear=2011
+endyear=2013
 
 numyears=endyear-startyear
 begSummer=4000
@@ -46,9 +54,9 @@ plt.ylabel("precip in mm")
 ax = plt.subplot(111)
 ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
 
-for n in range(startyear,(endyear+1)): #years +1 exclusive    
+for n in range(startyear,(endyear+1)): #+1 exclusive    
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
-    filename = "{}_HrlySummary_{}.csv".format(weatherstation,n)    
+    filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))    
     print "Calculating {}...".format(n)
     date_time = pandas.read_csv(filename, parse_dates=[0], \
         header=None, usecols=[0],skiprows=20)
@@ -150,21 +158,15 @@ y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
-t=[["wet season","{0:.2f}".format(w_mustormlength), \
-    "{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24), \
-    "{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_mustormcount)], \
-    ["dry season","{0:.2f}".format(d_mustormlength), \
-    "{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24), \
-    "{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_mustormcount)], \
-    ["year average","{0:.2f}".format(y_mustormlength), \
-    "{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24), \
-    "{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_mustormcount)]]
+t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_mustormcount)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_mustormcount)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_mustormcount)]]
 h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
          
 out= tabulate(t,h)
 
 with open("{}Output.txt".format(weatherstation), "w") as text_file:
-    text_file.write("(Calculated {} averages using years {} to {}) \n \n".format(weatherstation,startyear,endyear))    
+    text_file.write("Calculated {} averages using years {} to {} \n".format(weatherstation,startyear,endyear))    
+    text_file.write("skipped 2010, missing precip data\n \n")
     text_file.write(out)
 
-print out  
+print out    
+        
