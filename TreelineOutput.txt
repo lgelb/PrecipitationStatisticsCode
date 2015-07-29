@@ -1,11 +1,11 @@
-Calculated Treeline averages using years 2008 to 2014 
+Calculated Treeline averages using years 2000 to 2014 
 skipped 1999, missing precip data
-something is wrong with files 2000-2007:
+some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day)         
+not sure why, but I manually deleted these rows If you don't, you get:         
 "ValueError: could not convert string to float:"
-
-
+ 
                 S (hrs)  IS (hrs/days)      D (mm)    num S
 ------------  ---------  ---------------  --------  -------
-wet season         2.37  71.55/2.98           5         103
-dry season         1.98  297.26/12.39         5.03        8
-year average       2.35  88.42/3.68           5         111
+wet season         2.21  69.88/2.91           4.74       94
+dry season         1.87  336.72/14.03         4.88        7
+year average       2.18  88.93/3.71           4.75      102

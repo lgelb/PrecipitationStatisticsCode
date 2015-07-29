@@ -12,7 +12,13 @@ this is an adaptation of the clean weather data code that should
 calculate storm statistics on an hourly and seasonal basis
 
 major flaw: this code does not deal with storms overlapping seasons
+
 cannot currently deal with missing data (-6999), manually ignore those years
+
+some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day)         
+not sure why, but I manually deleted these rows If you don't, you get:         
+"ValueError: could not convert string to float:"
+
 @author: lucyB570
 """
 
@@ -36,7 +42,7 @@ w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
 d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 
 weatherstation="Treeline"
-startyear=2008
+startyear=2000
 endyear=2014
 
 numyears=endyear-startyear
@@ -162,9 +168,7 @@ out= tabulate(t,h)
 
 with open("{}Output.txt".format(weatherstation), "w") as text_file:
     text_file.write("Calculated {} averages using years {} to {} \n".format(weatherstation,startyear,endyear))    
-    text_file.write("skipped 1999, missing precip data\n \
-    something is wrong with files 2000-2007\n \
-    ValueError\: could not convert string to float\:")
+    text_file.write("skipped 1999, missing precip data\n \n")
     text_file.write(out)
 
 print out    
