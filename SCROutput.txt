@@ -1,9 +1,10 @@
-Calculated SCR averages using years 2011 to 2012 
+Calculated SCR averages using years 2011 to 2013 
 skipped 2010, missing precip data
-currently stuck on "IndexError: list index out of range" error for 2013 
-
+Code breaks down on 2013 when I use the generic, so I used targeted one,
+saved in SRCfolder
+ 
                 S (hrs)  IS (hrs/days)      D (mm)    num S
 ------------  ---------  ---------------  --------  -------
-wet season         2.05  61.58/2.57           4.43      224
-dry season         1.6   305.80/12.74         3.55       10
-year average       2.03  72.02/3.00           4.39      234
+wet season         2.09  67.88/2.83           4.4       142
+dry season         1.52  178.88/7.45          2.97       16
+year average       2.03  79.40/3.31           4.25      159

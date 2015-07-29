@@ -59,14 +59,11 @@ ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
 
 for n in range(startyear,(endyear+1)): #+1 exclusive    
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
-    filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))    
+    filename = "{}_HrlySummary_{}.csv".format(weatherstation,n)
     print "Calculating {}...".format(n)
     date_time = pandas.read_csv(filename, parse_dates=[0], \
         header=None, usecols=[0],skiprows=20)
-    (precipHourly,tempC,solarradiation,totalradiation,relativehumidity, \
-        winddirectiondegree,windspeed,snowdepthcm)= \
-        numpy.loadtxt(filename,delimiter=",", \
-        usecols=[1,2,3,4,5,6,7,8],skiprows=20,unpack=True)
+    precipHourly = numpy.loadtxt(filename, delimiter=",", usecols=[1],skiprows=20)
     
     #initialize temporary variables
     templength=0
@@ -168,7 +165,9 @@ out= tabulate(t,h)
 
 with open("{}Output.txt".format(weatherstation), "w") as text_file:
     text_file.write("Calculated {} averages using years {} to {} \n".format(weatherstation,startyear,endyear))    
-    text_file.write("skipped 2010, missing precip data\n \n")
+    text_file.write("skipped 2010, missing precip data\n \
+    Code breaks down on 2013 when I use the generic, so I used \
+    targeted one, saved in SRCfolder\n\n")
     text_file.write(out)
 
 print out    

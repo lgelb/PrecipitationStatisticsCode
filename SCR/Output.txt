@@ -1,7 +1,0 @@
-(Calculated using years 2011 to 2013) 
- 
-                S (hrs)  IS (hrs/days)      D (mm)    num S
-------------  ---------  ---------------  --------  -------
-wet season         2.05  61.58/2.57           4.43      112
-dry season         1.6   305.80/12.74         3.55        5
-year average       2.03  72.02/3.00           4.39      117
