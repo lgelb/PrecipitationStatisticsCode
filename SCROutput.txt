@@ -8,3 +8,4 @@ saved in SRCfolder
 wet season         2.09  67.88/2.83           4.4       142
 dry season         1.52  178.88/7.45          2.97       16
 year average       2.03  79.40/3.31           4.25      159
+

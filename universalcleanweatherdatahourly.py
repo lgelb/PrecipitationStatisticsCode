@@ -35,29 +35,35 @@ import numpy,pandas,pylab,os
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 
+#initialize empty arrays, w=wet season, d=dry season
+#units are hours and mm
 w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
 d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 
+#these must be adjust manually
 weatherstation="SCR"
 startyear=2011
-endyear=2013
+endyear=2012
 
-numyears=endyear-startyear
-begSummer=4000
+numyears=endyear-startyear #finds the number of years the simulation is run
+begSummer=4000 #adjust these manually based on precip graph
 endSummer=6500
-stormthreshold=1 #precim is in mm (0.5 was used as the daily threshold)
+stormthreshold=1 #precip to count as a storm: precim is in mm (0.5 was used as the daily threshold)
 
+#initialized precip figure
 cm = plt.get_cmap('winter')
 plt.figure()
 plt.xlabel("day in year")
 plt.ylabel("precip in mm")
 ax = plt.subplot(111)
-ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)])
+ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)]) #color of lines changes non-randomly
 
 for n in range(startyear,(endyear+1)): #+1 exclusive    
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
     filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))    
     print "Calculating {}...".format(n)
+    #reads in one year's weather data, skipping 20 header rows,\
+    #for this code I'm only using precip, but there are much more data
     date_time = pandas.read_csv(filename, parse_dates=[0], \
         header=None, usecols=[0],skiprows=20)
     (precipHourly,tempC,solarradiation,totalradiation,relativehumidity, \
@@ -70,6 +76,7 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     tempdepth=0
     tempinterstorm=0
     
+    #plots this year's precip
     ax.plot(precipHourly, label=n)
     
     #actual counting of storm descriptors here
@@ -130,9 +137,6 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     (precipHourly,tempC,solarradiation,totalradiation,relativehumidity, \
         winddirectiondegree,windspeed,snowdepthcm)=([] for i in range(8))
 
-
-
-
 # Shrink current axis by 20%
 box = ax.get_position()
 ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -141,32 +145,32 @@ ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 pylab.title('{}'.format(weatherstation))
 pylab.savefig('{}YearlyPrecip.pdf'.format(weatherstation), bbox_inches='tight')
 
-
+#wetseason statistics
 w_mustormlength = numpy.mean(w_stormlength)
 w_mustormdepth = numpy.mean(w_stormdepth)
 w_muinterstorm = numpy.mean(w_interstorm)
 w_mustormcount = w_stormcount/numyears
 
+#dry season statistics
 d_mustormlength = numpy.mean(d_stormlength)
 d_mustormdepth = numpy.mean(d_stormdepth)
 d_muinterstorm = numpy.mean(d_interstorm)
 d_mustormcount = d_stormcount/numyears
 
-
+#yearly average statistics
 y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
 y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
+#create a table for easy formatting of output
 t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_mustormcount)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_mustormcount)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_mustormcount)]]
-h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
-         
+h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']         
 out= tabulate(t,h)
 
+#write findings to a file
 with open("{}Output.txt".format(weatherstation), "w") as text_file:
     text_file.write("Calculated {} averages using years {} to {} \n".format(weatherstation,startyear,endyear))    
     text_file.write("skipped 2010, missing precip data\n \n")
     text_file.write(out)
-
-print out    
-        
+print out       

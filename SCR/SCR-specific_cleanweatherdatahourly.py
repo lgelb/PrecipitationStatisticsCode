@@ -11,24 +11,21 @@ Created on Thu Jul 16 16:01:38 2015
 this is an adaptation of the clean weather data code that should
 calculate storm statistics on an hourly and seasonal basis
 
-major flaw: this code does not deal with storms overlapping seasons
+to use:
+    1)change weather station name to correspond with correct site
+    2)run once to see the plot that shows when precip is occuring, then
+    3)adjust dry/wet seasons to correspond with correct 'begSummer'
+    and 'endSummer' variables. You may also have to omit a year if precip
+    data is not included for the calender year (common if a datalogger
+    was installed in the spring)
+    4)change txtfile.write to have correct notes in the output file
 
-cannot currently deal with missing data (-6999), manually ignore those years
-
-some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day)         
-not sure why, but I manually deleted these rows If you don't, you get:         
-"ValueError: could not convert string to float:"
-
-@author: lucyB570
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 16 16:01:38 2015
-this is an adaptation of the clean weather data code that should
-calculate storm statistics on an hourly and seasonal basis
-
-major flaw: this code does not deal with storms overlapping seasons
+flaws:
+    -this code does not deal with storms overlapping seasons
+    -cannot currently deal with missing data (-6999), manually ignore those years
+    -some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day). Not sure why,
+    but I manually deleted these rows. If you don't, you get: "ValueError: could
+    not convert string to float:"
 
 @author: lucyB570
 """
