@@ -85,7 +85,13 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     tempTT=(900/(tempTinC+273))**tempU2 #temperature term (aux calc for wind term)
     tempeT=0.6108**((17.27+tempTinC)/(tempTinC+237.3)) #mean saturation air pressure from air temp
     tempea= tempeT*(numpy.mean(relativehumidity.reshape(-1,24),axis=1)/100)#acutal vapor pressure from relative humidity
-    tempdr=[1+0.033*numpy.cos((2*numpy.pi)/(365)*(i+1)) for i,elem in enumerate(tempea)]#inverse relative distance earth-sun
+    tempdr=[1+0.033*numpy.cos((2*numpy.pi/365)*(i+1)) for i,elem in enumerate(tempea)]#inverse relative distance earth-sun
+    tempSdec=[0.409*numpy.sin(((2*numpy.pi/365)*(i+1))-1.39) for i,elem in enumerate(tempea)] #solar declination
+    tempOmegas=numpy.arccos(-numpy.tan(latitude)*numpy.tan(tempSdec)) #sunset hour angle
+    tempRa=24*60/numpy.pi*0.0820*tempdr* \
+        ((tempOmegas*numpy.sin(latitude)*numpy.sin(tempSdec)) \
+        +(numpy.cos(latitude)*numpy.cos(tempSdec)*numpy.sin(tempOmegas))) #extraterrestrial radiation
+    tempRso=(0.75+2*numpy.exp(-5) *z)*tempRa #clear sky solar radiation
 
     #initialize temporary variables
     templength=0
