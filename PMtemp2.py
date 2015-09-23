@@ -7,15 +7,13 @@ Created on Tue Sep 22 12:17:47 2015
 
 import numpy, os
 
-def worker():
+def worker(filename,stationstats):
 
     z= 2114 #elevation above sea level (m)
     P=101.3*(((293-0.0065*z)/293)**5.26) #atmospheric pressure (kPa)
     gamma=0.000665*P #psycromatic constant
     latitude=43.75876
     a= 0.23 #albedo for grass
-
-    filename = os.path.join('BRWtemp','BRWtemp_HrlySummary_2013.csv')
 
     (precipHourly,temperatureC,solarradiation,netradiation,relativehumidity, \
         winddirectiondegree,windspeed,snowdepthcm)= \
@@ -78,6 +76,18 @@ def worker():
     tempETwind=tempPT*tempTT*(tempes-tempea)
     #FINAL evaportranspiration value
     ETo=tempETwind+tempETrad
+    return ETo
 
 if __name__ == '__main__':
-    worker()
+
+    weatherstation='BRWtemp'
+    startyear=2013
+    endyear=2014
+    '''find someway to make this a dictionary that reads from a file of stats'''
+    stationstats=5
+
+    for n in range(startyear,(endyear+1)): #+1 exclusive
+
+        filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))
+
+        PET[i] = worker(filename,stationstats)
