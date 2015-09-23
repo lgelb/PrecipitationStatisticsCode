@@ -6,6 +6,7 @@ Created on Tue Sep 22 12:17:47 2015
 """
 
 import numpy, os
+import matplotlib.pyplot as plt
 
 def worker(filename,stationstats):
 
@@ -26,7 +27,7 @@ def worker(filename,stationstats):
     tempTmax=numpy.max(temperatureC.reshape(-1, 24), axis=1)
     #min daily temp
     tempTmin=numpy.min(temperatureC.reshape(-1, 24), axis=1)
-    #daily net radiation in MJ/m2/day
+    #daily net radiation in MJ/m2/dayF
     tempRs=(numpy.mean(netradiation.reshape(-1, 24), axis=1))*0.0864
      #average daily windspeed m/s
     tempU2=numpy.mean(windspeed.reshape(-1,24),axis=1)
@@ -78,16 +79,29 @@ def worker(filename,stationstats):
     ETo=tempETwind+tempETrad
     return ETo
 
+def plotMinMeanMax_(dataArray,yearlabels):
+    plt.figure()
+    for i in range(len(dataArray[0])):
+        plt.plot(dataArray[:,i], label = yearlabels[i])
+    plt.xlabel('Julian day')
+    plt.ylabel('PET (mm/day)')
+    plt.legend(loc = 1)
+
 if __name__ == '__main__':
 
     weatherstation='BRWtemp'
     startyear=2013
     endyear=2014
+    numyears = endyear-startyear+1 # +1 exclusinve
     '''find someway to make this a dictionary that reads from a file of stats'''
     stationstats=5
+    PET=numpy.empty((365,numyears,))
+    PET[:]=numpy.NaN
 
-    for n in range(startyear,(endyear+1)): #+1 exclusive
+    for n in range(numyears): # +1 exclusive
 
-        filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))
+        filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,(n+startyear)))
 
-        PET[i] = worker(filename,stationstats)
+        PET[:,(n)]= worker(filename,stationstats)
+    yearlabels=range(startyear,endyear+1) # +1 exclusive
+    plotMinMeanMax_(PET,yearlabels)
