@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 22 12:17:47 2015
-
+This code takes in cleaned DCEW weather data and returns the PET value for that
+area based on 4 different pfts (bare,grass,shrub,tree)
+thanks to: http://edis.ifas.ufl.edu/pdffiles/ae/ae45900.pdf
+and: http://www.luiw.ethz.ch/labor2/experimente/exp4/Presentation/Net_Longwave_Radiation
+and: http://edis.ifas.ufl.edu/ae459
 @author: lucyB570
 """
 
 import numpy, os
 import matplotlib.pyplot as plt
 
-def worker(filename,stationstats):
+def calcPET_(filename,stationstats):
 
-    z= 2114 #elevation above sea level (m)
-    P=101.3*(((293-0.0065*z)/293)**5.26) #atmospheric pressure (kPa)
+    P=101.3*(((293-0.0065*stationstats['z'])/293)**5.26) #atmospheric pressure (kPa)
     gamma=0.000665*P #psycromatic constant
-    latitude=43.75876
+
     a= 0.23 #albedo for grass
 
     (precipHourly,temperatureC,solarradiation,netradiation,relativehumidity, \
@@ -55,13 +58,13 @@ def worker(filename,stationstats):
     #solar declination
     tempSdec=[0.409*numpy.sin(((2*numpy.pi/365)*(i+1))-1.39) for i,elem in enumerate(tempea)]
     #sunset hour angle
-    tempOmegas=numpy.arccos(-numpy.tan(latitude)*numpy.tan(tempSdec))
+    tempOmegas=numpy.arccos(-numpy.tan(stationstats['latitude'])*numpy.tan(tempSdec))
      #extraterrestrial radiation
     tempRa=([24*60/numpy.pi*0.0820*x for x in tempdr])* \
-        ((tempOmegas*numpy.sin(latitude)*numpy.sin(tempSdec)) \
-        +(numpy.cos(latitude)*numpy.cos(tempSdec)*numpy.sin(tempOmegas)))
+        ((tempOmegas*numpy.sin(stationstats['latitude'])*numpy.sin(tempSdec)) \
+        +(numpy.cos(stationstats['latitude'])*numpy.cos(tempSdec)*numpy.sin(tempOmegas)))
     #clear sky solar radiation
-    tempRso=(0.75+2*numpy.exp(-5) *z)*tempRa
+    tempRso=(0.75+2*numpy.exp(-5) *stationstats['z'])*tempRa
     #net soloar or net shortwave radiation
     tempRns=(1-a)* tempRs
     #net outgoinglongwave solar radiation (sigma is stefan-boltzman constant)
@@ -87,21 +90,51 @@ def plotMinMeanMax_(dataArray,yearlabels):
     plt.ylabel('PET (mm/day)')
     plt.legend(loc = 1)
 
+def seasonalPET_(PET):
+    #this will break PET into wet and dry seasons, get averages
+    begSummer=171 # initially based on stormstatsgenerator precip graph from
+    endSummer=266 # DCEW stations,but adjusted slightly to start of summer&fall
+
+    #concatonates spring and fall/winter values (why doesn't Jim use water years???)
+    tempwetPET=PET[0:begSummer:1]
+    tempwetPET=numpy.append(tempwetPET,PET[endSummer:365:1],axis=0)
+
+    PETwet=numpy.mean(tempwetPET,axis=0)
+    PETdry=numpy.mean(PET[begSummer:endSummer:1],axis=0)
+    return PETwet,PETdry
+
+def saveData_():
+    x=5
+
+def plotData_(PET):
+    #plots that PET data for each year, saves that fig
+    yearlabels=range(stationstats['startyear'],stationstats['endyear']+1) # +1 exclusive
+    plotMinMeanMax_(PET,yearlabels)
+
 if __name__ == '__main__':
 
     weatherstation='BRWtemp'
-    startyear=2013
-    endyear=2014
-    numyears = endyear-startyear+1 # +1 exclusinve
-    '''find someway to make this a dictionary that reads from a file of stats'''
-    stationstats=5
+    stationstats={'startyear':2013,'endyear':2014,'z':2114,'latitude':43.75876} #z in m
+    #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
+    albedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
+    numyears = stationstats['endyear']-stationstats['startyear']+1 # +1 exclusinve
     PET=numpy.empty((365,numyears,))
     PET[:]=numpy.NaN
 
+    #gets daily PET for all years
     for n in range(numyears): # +1 exclusive
+        filename = os.path.join(weatherstation, \
+            "{}_HrlySummary_{}.csv".format(weatherstation, \
+            (n+stationstats['startyear'])))
+        PET[:,(n)]= calcPET_(filename,stationstats)
 
-        filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,(n+startyear)))
+    plotData_(PET)
 
-        PET[:,(n)]= worker(filename,stationstats)
-    yearlabels=range(startyear,endyear+1) # +1 exclusive
-    plotMinMeanMax_(PET,yearlabels)
+    #finds wet and dry season PET for each year
+    (PETwet,PETdry)=seasonalPET_(PET)
+
+
+
+
+
+
