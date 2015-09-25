@@ -27,6 +27,10 @@ def calcPET_(filename,stationstats):
     cleanData_(precipHourly,temperatureC,solarradiation,netradiation,\
         relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
 
+    if numpy.isfinite(checkMissingData_(precipHourly,temperatureC, \
+        solarradiation,netradiation,relativehumidity,winddirectiondegree, \
+        windspeed,snowdepthcm)):
+        print 'do something!'
 
     #average daily temp
     tempTmean=numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
@@ -96,6 +100,13 @@ def cleanData_(*argv):
             arg=arg[1:8760]
     return argv
 
+def checkMissingData_(*argv):
+    for i,arg in argv:
+        if numpy.all(arg):
+            return i
+        else:
+            return numpy.nan
+
 def seasonalPET_(PET):
     #this will break PET into wet and dry seasons, get averages
     begSummer=171 # initially based on stormstatsgenerator precip graph from
@@ -125,7 +136,7 @@ def plotPET_(dataArray,weatherstation,stationstats):
 
 if __name__ == '__main__':
 
-    weatherstation='BRWtemp'
+    weatherstation='LDP'
     stationstats={'startyear':2013,'endyear':2014,'z':2114,'latitude':43.75876} #z in m
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     albedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
