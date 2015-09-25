@@ -82,14 +82,6 @@ def calcPET_(filename,stationstats):
     ETo=tempETwind+tempETrad
     return ETo
 
-def plotMinMeanMax_(dataArray,yearlabels):
-    plt.figure()
-    for i in range(len(dataArray[0])):
-        plt.plot(dataArray[:,i], label = yearlabels[i])
-    plt.xlabel('Julian day')
-    plt.ylabel('PET (mm/day)')
-    plt.legend(loc = 1)
-
 def seasonalPET_(PET):
     #this will break PET into wet and dry seasons, get averages
     begSummer=171 # initially based on stormstatsgenerator precip graph from
@@ -103,13 +95,19 @@ def seasonalPET_(PET):
     PETdry=numpy.mean(PET[begSummer:endSummer:1],axis=0)
     return PETwet,PETdry
 
-def saveData_():
-    x=5
-
-def plotData_(PET):
-    #plots that PET data for each year, saves that fig
+def plotPET_(dataArray,weatherstation,stationstats):
+    # you need yearlabels so you can have a legend when you plot yearly pet
     yearlabels=range(stationstats['startyear'],stationstats['endyear']+1) # +1 exclusive
-    plotMinMeanMax_(PET,yearlabels)
+
+    plt.figure()
+    for i in range(len(dataArray[0])):
+        plt.plot(dataArray[:,i], label = yearlabels[i])
+    plt.xlim(0,365)
+    plt.xlabel('Julian day')
+    plt.ylabel('PET (mm/day)')
+    plt.legend(loc = 1)
+    plt.title('daily PET at {}'.format(weatherstation))
+    plt.savefig('{}.svg'.format(weatherstation),bbox_inches="tight",format='svg')
 
 if __name__ == '__main__':
 
@@ -128,11 +126,18 @@ if __name__ == '__main__':
             (n+stationstats['startyear'])))
         PET[:,(n)]= calcPET_(filename,stationstats)
 
-    plotData_(PET)
+    #plotPET_(PET,weatherstation,stationstats)
 
     #finds wet and dry season PET for each year
     (PETwet,PETdry)=seasonalPET_(PET)
 
+    output=range(stationstats['startyear'],stationstats['endyear']+1)
+    output=numpy.vstack((output,PETwet,PETdry))
+    output=output.transpose()
+
+    with open('{}_PET.csv'.format(weatherstation),'a') as text_file:
+        text_file.write('year,PETwet,PETdry\n')
+        numpy.savetxt(text_file,output,delimiter=',')
 
 
 
