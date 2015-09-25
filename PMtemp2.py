@@ -24,7 +24,7 @@ def calcPET_(filename,stationstats):
         numpy.loadtxt(filename,delimiter=",", \
         usecols=[1,2,3,4,5,6,7,8],skiprows=20,unpack=True)
 
-    addNans_(precipHourly,temperatureC,solarradiation,netradiation,\
+    cleanData_(precipHourly,temperatureC,solarradiation,netradiation,\
         relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
 
 
@@ -86,12 +86,15 @@ def calcPET_(filename,stationstats):
     ETo=tempETwind+tempETrad
     return ETo
 
-def addNans_(*argv):
+def cleanData_(*argv):
 
     for arg in argv:
         for i,elem in enumerate(arg):
             if arg[i]==-6999:
                 arg[i]=numpy.NAN
+        if len(arg)>8760: #remove Dec 31st on leap years so arrays are the same size
+            arg=arg[1:8760]
+    return argv
 
 def seasonalPET_(PET):
     #this will break PET into wet and dry seasons, get averages
