@@ -24,16 +24,20 @@ def calcPET_(filename,stationstats):
         numpy.loadtxt(filename,delimiter=",", \
         usecols=[1,2,3,4,5,6,7,8],skiprows=20,unpack=True)
 
+    addNans_(precipHourly,temperatureC,solarradiation,netradiation,\
+        relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
+
+
     #average daily temp
-    tempTmean=numpy.mean(temperatureC.reshape(-1, 24), axis=1)
+    tempTmean=numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
     #max daily temp
-    tempTmax=numpy.max(temperatureC.reshape(-1, 24), axis=1)
+    tempTmax=numpy.nanmax(temperatureC.reshape(-1, 24), axis=1)
     #min daily temp
-    tempTmin=numpy.min(temperatureC.reshape(-1, 24), axis=1)
+    tempTmin=numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
     #daily net radiation in MJ/m2/dayF
-    tempRs=(numpy.mean(netradiation.reshape(-1, 24), axis=1))*0.0864
+    tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
      #average daily windspeed m/s
-    tempU2=numpy.mean(windspeed.reshape(-1,24),axis=1)
+    tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
     #slope of saturation vapor pressure curve
     tempIhat=(4098*(0.6108**((17.21*tempTmean)/(tempTmean+237.3))))/((tempTmean+237.3)**2)
      #delta term (aux calc for radiation term)
@@ -49,8 +53,8 @@ def calcPET_(filename,stationstats):
     #mean saturation vopor pressure
     tempes=(tempTmax+tempeTmin)/2
     #relative humidity
-    tempRHmax=numpy.max(relativehumidity.reshape(-1,24),axis=1)
-    tempRHmin=numpy.min(relativehumidity.reshape(-1,24),axis=1)
+    tempRHmax=numpy.nanmax(relativehumidity.reshape(-1,24),axis=1)
+    tempRHmin=numpy.nanmin(relativehumidity.reshape(-1,24),axis=1)
     #acutal vapor pressure from relative humidity
     tempea= (tempeTmin*tempRHmax/100+tempeTmax*tempRHmin/100)/2
     #inverse relative distance earth-sun
@@ -82,6 +86,13 @@ def calcPET_(filename,stationstats):
     ETo=tempETwind+tempETrad
     return ETo
 
+def addNans_(*argv):
+
+    for arg in argv:
+        for i,elem in enumerate(arg):
+            if arg[i]==-6999:
+                arg[i]=numpy.NAN
+
 def seasonalPET_(PET):
     #this will break PET into wet and dry seasons, get averages
     begSummer=171 # initially based on stormstatsgenerator precip graph from
@@ -91,8 +102,8 @@ def seasonalPET_(PET):
     tempwetPET=PET[0:begSummer:1]
     tempwetPET=numpy.append(tempwetPET,PET[endSummer:365:1],axis=0)
 
-    PETwet=numpy.mean(tempwetPET,axis=0)
-    PETdry=numpy.mean(PET[begSummer:endSummer:1],axis=0)
+    PETwet=numpy.nanmean(tempwetPET,axis=0)
+    PETdry=numpy.nanmean(PET[begSummer:endSummer:1],axis=0)
     return PETwet,PETdry
 
 def plotPET_(dataArray,weatherstation,stationstats):
