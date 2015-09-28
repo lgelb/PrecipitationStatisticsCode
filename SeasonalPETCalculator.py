@@ -9,28 +9,57 @@ and: http://edis.ifas.ufl.edu/ae459
 @author: lucyB570
 """
 
-import numpy, os
+import numpy, os, warnings
 import matplotlib.pyplot as plt
 
-def calcPET_(filename,stationstats):
+def pftPET_(pft,albedo):
+
+    #gets daily PET for all years
+    for n in range(numyears): # +1 exclusive
+        filename = os.path.join(stationstats['weatherstation'], \
+            "{}_HrlySummary_{}.csv".format(stationstats['weatherstation'], \
+            (n+stationstats['startyear'])))
+        PET[:,(n)]= calcPET_(filename,stationstats,n,albedo)
+
+    #plotPET_(pft,PET,stationstats)
+
+    #finds wet and dry season PET for each year
+    (PETwet,PETdry)=seasonalPET_(PET)
+
+    output=range(stationstats['startyear'],stationstats['endyear']+1)
+    output=numpy.vstack((output,PETwet,PETdry))
+    output=output.transpose()
+    totmeans=numpy.nanmean(output,axis=0)
+
+    with open(os.path.join(stationstats['weatherstation'],('{}_PET_values.csv'.format(stationstats['weatherstation']))),'a') as text_file:
+        text_file.write('\nPFT: {}\nyear,PETwet,PETdry\n'.format(pft))
+        numpy.savetxt(text_file,output,delimiter=',',fmt=('%i','%8.3f','%8.3f'))
+        text_file.write('wet season average = {:.3f}, dry season average = {:.3f}\n' \
+            .format(totmeans[1],totmeans[2]))
+
+def calcPET_(filename,stationstats,n,a):
 
     P=101.3*(((293-0.0065*stationstats['z'])/293)**5.26) #atmospheric pressure (kPa)
     gamma=0.000665*P #psycromatic constant
 
-    a= 0.23 #albedo for grass
+    #a= 0.23 #albedo for grass
 
     (precipHourly,temperatureC,solarradiation,netradiation,relativehumidity, \
         winddirectiondegree,windspeed,snowdepthcm)= \
         numpy.loadtxt(filename,delimiter=",", \
         usecols=[1,2,3,4,5,6,7,8],skiprows=20,unpack=True)
 
-    cleanData_(precipHourly,temperatureC,solarradiation,netradiation,\
-        relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
+    (precipHourly,temperatureC,solarradiation,netradiation,relativehumidity, \
+        winddirectiondegree,windspeed,snowdepthcm)= \
+        cleanData_(precipHourly,temperatureC,solarradiation,netradiation, \
+                   relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
 
-    if numpy.isfinite(checkMissingData_(precipHourly,temperatureC, \
-        solarradiation,netradiation,relativehumidity,winddirectiondegree, \
-        windspeed,snowdepthcm)):
-        print 'do something!'
+    missingData= checkMissingData_(precipHourly,temperatureC,solarradiation, \
+        netradiation,relativehumidity, winddirectiondegree,windspeed,snowdepthcm)
+    if missingData == True:
+        print 'missing data for year {}'.format(stationstats['startyear']+n)
+        ETo=[numpy.nan]*365
+        return ETo
 
     #average daily temp
     tempTmean=numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
@@ -40,7 +69,7 @@ def calcPET_(filename,stationstats):
     tempTmin=numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
     #daily net radiation in MJ/m2/dayF
     tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
-     #average daily windspeed m/s
+    #average daily windspeed m/s
     tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
     #slope of saturation vapor pressure curve
     tempIhat=(4098*(0.6108**((17.21*tempTmean)/(tempTmean+237.3))))/((tempTmean+237.3)**2)
@@ -51,7 +80,7 @@ def calcPET_(filename,stationstats):
     #temperature term (aux calc for wind term)
     tempTT=(900/(tempTmean+273))**tempU2
     #saturation air pressure from air temp
-    tempeTmean=0.6108**((17.27+tempTmean)/(tempTmean+237.3))
+    #tempeTmean=0.6108**((17.27+tempTmean)/(tempTmean+237.3)) #unused
     tempeTmax=0.6108**(17.27*tempTmax/(tempTmax+237.3))
     tempeTmin= 0.6108**(17.27*tempTmin/(tempTmin+237.3))
     #mean saturation vopor pressure
@@ -88,24 +117,27 @@ def calcPET_(filename,stationstats):
     tempETwind=tempPT*tempTT*(tempes-tempea)
     #FINAL evaportranspiration value
     ETo=tempETwind+tempETrad
+    ETo=ETo[0:365]
+
     return ETo
 
 def cleanData_(*argv):
-
     for arg in argv:
         for i,elem in enumerate(arg):
             if arg[i]==-6999:
                 arg[i]=numpy.NAN
-        if len(arg)>8760: #remove Dec 31st on leap years so arrays are the same size
-            arg=arg[1:8760]
     return argv
+'''for some reason this bit below doesn't work'''
+#        if len(arg)>8760: #remove Dec 31st on leap years so arrays are the same size
+#            arg=arg[0:8760]
+#    return argv #why does adding/deleting this not change anything?
 
 def checkMissingData_(*argv):
-    for i,arg in argv:
-        if numpy.all(arg):
-            return i
-        else:
-            return numpy.nan
+    temp=False
+    for i,arg in enumerate(argv):
+        if numpy.all(numpy.isnan(arg)): #if all values of one variable are missing (NaNs)
+            temp=True
+    return temp
 
 def seasonalPET_(PET):
     #this will break PET into wet and dry seasons, get averages
@@ -120,7 +152,7 @@ def seasonalPET_(PET):
     PETdry=numpy.nanmean(PET[begSummer:endSummer:1],axis=0)
     return PETwet,PETdry
 
-def plotPET_(dataArray,weatherstation,stationstats):
+def plotPET_(pft,dataArray,stationstats):
     # you need yearlabels so you can have a legend when you plot yearly pet
     yearlabels=range(stationstats['startyear'],stationstats['endyear']+1) # +1 exclusive
 
@@ -131,40 +163,27 @@ def plotPET_(dataArray,weatherstation,stationstats):
     plt.xlabel('Julian day')
     plt.ylabel('PET (mm/day)')
     plt.legend(loc = 1)
-    plt.title('daily PET at {}'.format(weatherstation))
-    plt.savefig('{}.svg'.format(weatherstation),bbox_inches="tight",format='svg')
+    plt.title('daily {} PET at {}'.format(pft,stationstats['weatherstation']))
+    plt.savefig(os.path.join(stationstats['weatherstation'],('{}_{}_PET.svg'.format \
+        (stationstats['weatherstation'],pft))),bbox_inches="tight",format='svg')
 
 if __name__ == '__main__':
 
-    weatherstation='LDP'
-    stationstats={'startyear':2013,'endyear':2014,'z':2114,'latitude':43.75876} #z in m
+#    warnings.simplefilter("error")
+
+    BRWtemp={'weatherstation':'BRWtemp','startyear':2011,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
+    LDP={'weatherstation':'LDP','startyear':2007,'endyear':2014,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+    Treeline={'weatherstation':'Treeline','startyear':1999,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
+    SCR={'weatherstation':'SCR','startyear':2010,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
+    LW={'weatherstation':'LW','startyear':1120,'endyear':2014,'z':2114,'latitude':43.6892464,'longitude':-116.1696892}
+
+    stationstats=BRWtemp
+
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
-    albedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
+    pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
     numyears = stationstats['endyear']-stationstats['startyear']+1 # +1 exclusinve
     PET=numpy.empty((365,numyears,))
     PET[:]=numpy.NaN
 
-    #gets daily PET for all years
-    for n in range(numyears): # +1 exclusive
-        filename = os.path.join(weatherstation, \
-            "{}_HrlySummary_{}.csv".format(weatherstation, \
-            (n+stationstats['startyear'])))
-        PET[:,(n)]= calcPET_(filename,stationstats)
-
-    #plotPET_(PET,weatherstation,stationstats)
-
-    #finds wet and dry season PET for each year
-    (PETwet,PETdry)=seasonalPET_(PET)
-
-    output=range(stationstats['startyear'],stationstats['endyear']+1)
-    output=numpy.vstack((output,PETwet,PETdry))
-    output=output.transpose()
-
-    with open('{}_PET.csv'.format(weatherstation),'a') as text_file:
-        text_file.write('year,PETwet,PETdry\n')
-        numpy.savetxt(text_file,output,delimiter=',')
-
-
-
-
-
+    for k,v in pftAlbedo.items():
+        pftPET_(k,v)
