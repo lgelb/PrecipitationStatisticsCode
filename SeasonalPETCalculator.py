@@ -21,7 +21,8 @@ def pftPET_(pft,albedo):
             (n+stationstats['startyear'])))
         PET[:,(n)]= calcPET_(filename,stationstats,n,albedo)
 
-    #plotPET_(pft,PET,stationstats)
+    if plotyearlyPET:
+        plotPET_(pft,PET,stationstats)
 
     #finds wet and dry season PET for each year
     (PETwet,PETdry)=seasonalPET_(PET)
@@ -52,7 +53,11 @@ def calcPET_(filename,stationstats,n,a):
     (precipHourly,temperatureC,solarradiation,netradiation,relativehumidity, \
         winddirectiondegree,windspeed,snowdepthcm)= \
         cleanData_(precipHourly,temperatureC,solarradiation,netradiation, \
-                   relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
+        relativehumidity,winddirectiondegree,windspeed,snowdepthcm)
+
+#    for i,elem in enumerate(netradiation): #removes negative net radiation values
+#        if netradiation[i]<0:
+#            netradiation[i]=numpy.nan
 
     missingData= checkMissingData_(precipHourly,temperatureC,solarradiation, \
         netradiation,relativehumidity, winddirectiondegree,windspeed,snowdepthcm)
@@ -160,6 +165,7 @@ def plotPET_(pft,dataArray,stationstats):
     for i in range(len(dataArray[0])):
         plt.plot(dataArray[:,i], label = yearlabels[i])
     plt.xlim(0,365)
+    plt.ylim(-100,100)
     plt.xlabel('Julian day')
     plt.ylabel('PET (mm/day)')
     plt.legend(loc = 1)
@@ -171,13 +177,16 @@ if __name__ == '__main__':
 
 #    warnings.simplefilter("error")
 
-    BRWtemp={'weatherstation':'BRWtemp','startyear':2011,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
-    LDP={'weatherstation':'LDP','startyear':2007,'endyear':2014,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
-    Treeline={'weatherstation':'Treeline','startyear':1999,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
-    SCR={'weatherstation':'SCR','startyear':2010,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
-    LW={'weatherstation':'LW','startyear':1120,'endyear':2014,'z':2114,'latitude':43.6892464,'longitude':-116.1696892}
+    BRWtemp={'weatherstation':'BRWtemp','startyear':2012,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
+    LDP={'weatherstation':'LDP','startyear':2010,'endyear':2014,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+    Treeline={'weatherstation':'Treeline','startyear':2008,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
+    SCR={'weatherstation':'SCR','startyear':2011,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
+    LowerWeather={'weatherstation':'LowerWeather','startyear':2008,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
+
+    #something wrong with scr data
 
     stationstats=BRWtemp
+    plotyearlyPET=True
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}

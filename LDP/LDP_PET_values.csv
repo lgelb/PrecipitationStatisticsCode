@@ -1,0 +1,220 @@
+
+PFT: tree
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.063,  79.579
+2011,  61.136,  67.642
+2012,  63.237,  90.701
+2013,  33.598,  95.071
+2014,165628.843,2028.478
+wet season average = 33170.975, dry season average = 472.294
+
+PFT: grass
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.039,  79.377
+2011,  61.114,  67.475
+2012,  63.183,  90.559
+2013,  33.539,  94.932
+2014,165628.796,2028.370
+wet season average = 33170.934, dry season average = 472.143
+
+PFT: bare
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.049,  79.458
+2011,  61.123,  67.542
+2012,  63.204,  90.616
+2013,  33.563,  94.988
+2014,165628.815,2028.413
+wet season average = 33170.951, dry season average = 472.203
+
+PFT: shrub
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.054,  79.498
+2011,  61.127,  67.575
+2012,  63.215,  90.644
+2013,  33.574,  95.015
+2014,165628.824,2028.435
+wet season average = 33170.959, dry season average = 472.233
+
+PFT: tree
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.063,  79.579
+2011,  61.136,  67.642
+2012,  63.237,  90.701
+2013,  33.598,  95.071
+2014,165628.843,2028.478
+wet season average = 33170.975, dry season average = 472.294
+
+PFT: grass
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.039,  79.377
+2011,  61.114,  67.475
+2012,  63.183,  90.559
+2013,  33.539,  94.932
+2014,165628.796,2028.370
+wet season average = 33170.934, dry season average = 472.143
+
+PFT: bare
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.049,  79.458
+2011,  61.123,  67.542
+2012,  63.204,  90.616
+2013,  33.563,  94.988
+2014,165628.815,2028.413
+wet season average = 33170.951, dry season average = 472.203
+
+PFT: shrub
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.054,  79.498
+2011,  61.127,  67.575
+2012,  63.215,  90.644
+2013,  33.574,  95.015
+2014,165628.824,2028.435
+wet season average = 33170.959, dry season average = 472.233
+
+PFT: tree
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.063,  79.579
+2011,  61.136,  67.642
+2012,  63.237,  90.701
+2013,  33.598,  95.071
+2014,165628.843,2028.478
+wet season average = 33170.975, dry season average = 472.294
+
+PFT: grass
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.039,  79.377
+2011,  61.114,  67.475
+2012,  63.183,  90.559
+2013,  33.539,  94.932
+2014,165628.796,2028.370
+wet season average = 33170.934, dry season average = 472.143
+
+PFT: bare
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.049,  79.458
+2011,  61.123,  67.542
+2012,  63.204,  90.616
+2013,  33.563,  94.988
+2014,165628.815,2028.413
+wet season average = 33170.951, dry season average = 472.203
+
+PFT: shrub
+year,PETwet,PETdry
+2007,     nan,     nan
+2008,     nan,     nan
+2009,     nan,     nan
+2010,  68.054,  79.498
+2011,  61.127,  67.575
+2012,  63.215,  90.644
+2013,  33.574,  95.015
+2014,165628.824,2028.435
+wet season average = 33170.959, dry season average = 472.233
+
+PFT: tree
+year,PETwet,PETdry
+2009,     nan,     nan
+2010,  68.063,  79.579
+2011,  61.136,  67.642
+2012,  63.237,  90.701
+2013,  33.598,  95.071
+2014,165628.843,2028.478
+wet season average = 33170.975, dry season average = 472.294
+
+PFT: grass
+year,PETwet,PETdry
+2009,     nan,     nan
+2010,  68.039,  79.377
+2011,  61.114,  67.475
+2012,  63.183,  90.559
+2013,  33.539,  94.932
+2014,165628.796,2028.370
+wet season average = 33170.934, dry season average = 472.143
+
+PFT: bare
+year,PETwet,PETdry
+2009,     nan,     nan
+2010,  68.049,  79.458
+2011,  61.123,  67.542
+2012,  63.204,  90.616
+2013,  33.563,  94.988
+2014,165628.815,2028.413
+wet season average = 33170.951, dry season average = 472.203
+
+PFT: shrub
+year,PETwet,PETdry
+2009,     nan,     nan
+2010,  68.054,  79.498
+2011,  61.127,  67.575
+2012,  63.215,  90.644
+2013,  33.574,  95.015
+2014,165628.824,2028.435
+wet season average = 33170.959, dry season average = 472.233
+
+PFT: tree
+year,PETwet,PETdry
+2010,  68.063,  79.579
+2011,  61.136,  67.642
+2012,  63.237,  90.701
+2013,  33.598,  95.071
+2014,165628.843,2028.478
+wet season average = 33170.975, dry season average = 472.294
+
+PFT: grass
+year,PETwet,PETdry
+2010,  68.039,  79.377
+2011,  61.114,  67.475
+2012,  63.183,  90.559
+2013,  33.539,  94.932
+2014,165628.796,2028.370
+wet season average = 33170.934, dry season average = 472.143
+
+PFT: bare
+year,PETwet,PETdry
+2010,  68.049,  79.458
+2011,  61.123,  67.542
+2012,  63.204,  90.616
+2013,  33.563,  94.988
+2014,165628.815,2028.413
+wet season average = 33170.951, dry season average = 472.203
+
+PFT: shrub
+year,PETwet,PETdry
+2010,  68.054,  79.498
+2011,  61.127,  67.575
+2012,  63.215,  90.644
+2013,  33.574,  95.015
+2014,165628.824,2028.435
+wet season average = 33170.959, dry season average = 472.233
