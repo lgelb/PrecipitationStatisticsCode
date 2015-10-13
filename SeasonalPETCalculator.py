@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Sep 22 12:17:47 2015
-This code takes in cleaned DCEW weather data and returns the PET value for that
-area based on 4 different pfts (bare,grass,shrub,tree)
+This code takes in cleaned DCEW weather data and returns the PET value in
+mm/day for that area based on 4 different pfts (bare,grass,shrub,tree)
 thanks to: http://edis.ifas.ufl.edu/pdffiles/ae/ae45900.pdf
 and: http://www.luiw.ethz.ch/labor2/experimente/exp4/Presentation/Net_Longwave_Radiation
 and: http://edis.ifas.ufl.edu/ae459
