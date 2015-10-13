@@ -32,11 +32,13 @@ def pftPET_(pft,albedo):
     output=output.transpose()
     totmeans=numpy.nanmean(output,axis=0)
 
-    with open(os.path.join(stationstats['weatherstation'],('{}_PET_values.csv'.format(stationstats['weatherstation']))),'a') as text_file:
-        text_file.write('\nPFT: {}\nyear,PETwet,PETdry\n'.format(pft))
-        numpy.savetxt(text_file,output,delimiter=',',fmt=('%i','%8.3f','%8.3f'))
-        text_file.write('wet season average = {:.3f}, dry season average = {:.3f}\n' \
-            .format(totmeans[1],totmeans[2]))
+    #saves calculated PET values in the weather station's folder as '<station>_PET_values.csv'
+    if saveyearlyPET:
+        with open(os.path.join(stationstats['weatherstation'],('{}_PET_values.csv'.format(stationstats['weatherstation']))),'a') as text_file:
+            text_file.write('\nPFT: {}\nyear,PETwet,PETdry\n'.format(pft))
+            numpy.savetxt(text_file,output,delimiter=',',fmt=('%i','%8.3f','%8.3f'))
+            text_file.write('wet season average = {:.3f}, dry season average = {:.3f}\n' \
+                .format(totmeans[1],totmeans[2]))
 
 def calcPET_(filename,stationstats,n,a):
 
@@ -74,8 +76,13 @@ def calcPET_(filename,stationstats,n,a):
     tempTmin=numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
     #daily net radiation in MJ/m2/dayF
     tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
+
     #average daily windspeed m/s
-    tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
+#    tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
+    ''' altered this to troubleshoot'''
+    tempU2=numpy.full((365),numpy.nanmean(windspeed))
+
+
     #slope of saturation vapor pressure curve
     tempIhat=(4098*(0.6108**((17.21*tempTmean)/(tempTmean+237.3))))/((tempTmean+237.3)**2)
      #delta term (aux calc for radiation term)
@@ -87,9 +94,9 @@ def calcPET_(filename,stationstats,n,a):
     #saturation air pressure from air temp
     #tempeTmean=0.6108**((17.27+tempTmean)/(tempTmean+237.3)) #unused
     tempeTmax=0.6108**(17.27*tempTmax/(tempTmax+237.3))
-    tempeTmin= 0.6108**(17.27*tempTmin/(tempTmin+237.3))
+    tempeTmin=0.6108**(17.27*tempTmin/(tempTmin+237.3))
     #mean saturation vopor pressure
-    tempes=(tempTmax+tempeTmin)/2
+    tempes=(tempeTmax+tempeTmin)/2
     #relative humidity
     tempRHmax=numpy.nanmax(relativehumidity.reshape(-1,24),axis=1)
     tempRHmin=numpy.nanmin(relativehumidity.reshape(-1,24),axis=1)
@@ -165,7 +172,6 @@ def plotPET_(pft,dataArray,stationstats):
     for i in range(len(dataArray[0])):
         plt.plot(dataArray[:,i], label = yearlabels[i])
     plt.xlim(0,365)
-    plt.ylim(-100,100)
     plt.xlabel('Julian day')
     plt.ylabel('PET (mm/day)')
     plt.legend(loc = 1)
@@ -185,8 +191,11 @@ if __name__ == '__main__':
 
     #something wrong with scr data
 
+    BRWtemp['startyear']=2014
+
     stationstats=BRWtemp
     plotyearlyPET=True
+    saveyearlyPET=True
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
@@ -196,3 +205,4 @@ if __name__ == '__main__':
 
     for k,v in pftAlbedo.items():
         pftPET_(k,v)
+
