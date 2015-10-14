@@ -9,7 +9,7 @@ and: http://edis.ifas.ufl.edu/ae459
 @author: lucyB570
 """
 
-import numpy, os, warnings
+import numpy, os, warnings, pandas
 import matplotlib.pyplot as plt
 
 def pftPET_(pft,albedo):
@@ -78,9 +78,13 @@ def calcPET_(filename,stationstats,n,a):
     tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
 
     #average daily windspeed m/s
-#    tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
+    tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
     ''' altered this to troubleshoot'''
-    tempU2=numpy.full((365),numpy.nanmean(windspeed))
+#    tempU2=numpy.full((365),numpy.nanmean(windspeed))
+    tempU2[tempU2>20]=0#numpy.NaN
+#    tempU2=pandas.rolling_median(tempU2,3)
+#    tempU2=pandas.rolling_median(tempU2,20)
+
 
 
     #slope of saturation vapor pressure curve
