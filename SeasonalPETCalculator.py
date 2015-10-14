@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     stationstats=BRWtemp
     plotyearlyPET=True
-    saveyearlyPET=True
+    saveyearlyPET=False
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
@@ -203,6 +203,7 @@ if __name__ == '__main__':
     PET=numpy.empty((365,numyears,))
     PET[:]=numpy.NaN
 
+    #finds PET for all pft albedo values (4)
     for k,v in pftAlbedo.items():
         pftPET_(k,v)
 
