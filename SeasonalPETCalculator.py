@@ -198,8 +198,6 @@ if __name__ == '__main__':
 
     #something wrong with scr data
 
-    BRWtemp['startyear']=2012
-
     stationstats=LDP
     plotyearlyPET=True
     saveyearlyPET=True

@@ -38,12 +38,21 @@ from tabulate import tabulate
 import matplotlib.pyplot as plt
 
 '''these must be adjust manually'''
-weatherstation="BRWtemp"
-startyear=2013
-endyear=2014
-begSummer=4104 #adjust these manually based your needs
+
+BRW={'weatherstation':'BRW','startyear':2013,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
+LDP={'weatherstation':'LDP','startyear':2010,'endyear':2013,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+Treeline={'weatherstation':'Treeline','startyear':2008,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
+SCR={'weatherstation':'SCR','startyear':2011,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
+LowerWeather={'weatherstation':'LowerWeather','startyear':2008,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
+
+weatherstation=BRW
+startyear=weatherstation['startyear']
+endyear=weatherstation['endyear']
+# adjust these manually based your needs
+begSummer=4104
 endSummer=6480
-stormthreshold=1 #precip to count as a storm: precim is in mm (0.5 was used as the daily threshold)
+# precip to count as a storm: precim is in mm
+stormthreshold=1 # (0.5 was used as the daily threshold)
 '''-----------------------------'''
 
 #initialize empty arrays, w=wet season, d=dry season
@@ -55,14 +64,15 @@ numyears=endyear-startyear #finds the number of years the simulation is run
 #initialized precip figure
 cm = plt.get_cmap('winter')
 plt.figure()
-plt.xlabel("day in year")
+plt.xlabel("hour in year")
 plt.ylabel("precip in mm")
 ax = plt.subplot(111)
 ax.set_color_cycle([cm(1.*i/numyears) for i in range(numyears)]) #color of lines changes non-randomly
 
 for n in range(startyear,(endyear+1)): #+1 exclusive
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
-    filename = os.path.join(weatherstation,"{}_HrlySummary_{}.csv".format(weatherstation,n))
+    filename = os.path.join(weatherstation['weatherstation'], \
+                        "{}_HrlySummary_{}.csv".format(weatherstation['weatherstation'],n))
     print "Calculating {}...".format(n)
     #reads in one year's precip data, skipping 20 header rows,\
     precipHourly= numpy.loadtxt(filename,delimiter=",", \
@@ -139,8 +149,9 @@ box = ax.get_position()
 ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 # Put a legend to the right of the current axis
 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-pylab.title('{}'.format(weatherstation))
-pylab.savefig('{}YearlyPrecip.pdf'.format(weatherstation), bbox_inches='tight')
+pylab.title('hourly {} precipitation'.format(weatherstation['weatherstation']))
+pylab.savefig(os.path.join(weatherstation['weatherstation'],'Precip_{}.svg'.format(\
+                    weatherstation['weatherstation'])), bbox_inches="tight",format='svg')
 
 #wetseason statistics
 w_mustormlength = numpy.mean(w_stormlength)
@@ -161,13 +172,24 @@ y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
 y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
 #create a table for easy formatting of output
-t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format(w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format(w_mustormdepth),"{0:.2f}".format(w_mustormcount)],["dry season","{0:.2f}".format(d_mustormlength),"{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),"{0:.2f}".format(d_mustormdepth),"{0:.2f}".format(d_mustormcount)],["year average","{0:.2f}".format(y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm,y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth),"{0:.2f}".format(y_mustormcount)]]
+t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format( \
+                    w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format( \
+                    w_mustormdepth),"{0:.2f}".format(w_mustormcount)], \
+                    ["dry season","{0:.2f}".format(d_mustormlength), \
+                    "{0:.2f}/{1:.2f}".format(d_muinterstorm,d_muinterstorm/24),\
+                    "{0:.2f}".format(d_mustormdepth),"{0:.2f}".format( \
+                    d_mustormcount)],["year average","{0:.2f}".format( \
+                    y_mustormlength),"{0:.2f}/{1:.2f}".format(y_muinterstorm, \
+                    y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth), \
+                    "{0:.2f}".format(y_mustormcount)]]
 h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
 out= tabulate(t,h)
 
 #write findings to a file
-with open("{}Output.txt".format(weatherstation), "w") as text_file:
-    text_file.write("Calculated {} averages using years {} to {} \n".format(weatherstation,startyear,endyear))
+with open(os.path.join(weatherstation['weatherstation'],"Precip_{}.txt".format( \
+                    weatherstation['weatherstation'])), "w") as text_file:
+    text_file.write("Calculated {} averages using years {} to {} \n".format( \
+                    weatherstation['weatherstation'],startyear,endyear))
     text_file.write("skipped 2010, missing precip data\n \n")
     text_file.write("elevation at BRW is 2114 m")
     text_file.write(out)
