@@ -1,0 +1,6 @@
+Calculated SCR averages using years 2010 to 2013 
+                S (hrs)  IS (hrs/days)      D (mm)    num S
+------------  ---------  ---------------  --------  -------
+wet season        23.38  66.40/2.77           4.36      109
+dry season         1.59  191.67/7.99          3.08        9
+year average      21.72  75.95/3.16           4.26      118

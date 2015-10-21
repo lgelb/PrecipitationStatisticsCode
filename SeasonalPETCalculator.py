@@ -27,7 +27,6 @@ def pftPET_(pft,albedo):
 
     #finds wet and dry season PET for each year
     (PETwet,PETdry)=seasonalPET_(PET)
-    print PETwet, PETdry
 
     output=range(stationstats['startyear'],stationstats['endyear']+1)
     output=numpy.vstack((output,PETwet,PETdry))
@@ -80,7 +79,7 @@ def calcPET_(filename,stationstats,n,a):
     tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
     #average daily windspeed m/s
     tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
-    tempU2[:]=numpy.nanmean(tempU2)
+    tempU2[:]=numpy.nanmedian(tempU2)
     ''' altered this to troubleshoot'''
 #    tempU2=numpy.full((365),numpy.nanmean(windspeed)) # mean hourly unstead of daily
 #    tempU2[tempU2>3]=0#numpy.NaN
@@ -136,7 +135,7 @@ def calcPET_(filename,stationstats,n,a):
     #FINAL evaportranspiration value
     ETo=tempETwind+tempETrad
     ETo=ETo[0:365]
- #   ETo[ETo>8]=numpy.NaN
+    ETo[ETo<0]=numpy.NaN
 
     return ETo
 
@@ -190,15 +189,15 @@ if __name__ == '__main__':
 
 #    warnings.simplefilter("error")
 
-    BRWtemp={'weatherstation':'BRWtemp','startyear':2012,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
-    LDP={'weatherstation':'LDP','startyear':2010,'endyear':2013,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
-    Treeline={'weatherstation':'Treeline','startyear':2008,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
+    BRW={'weatherstation':'BRWtemp','startyear':2012,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
+    LDP={'weatherstation':'LDP','startyear':2007,'endyear':2013,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+    Treeline={'weatherstation':'Treeline','startyear':1999,'endyear':2012,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
     SCR={'weatherstation':'SCR','startyear':2011,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
-    LowerWeather={'weatherstation':'LowerWeather','startyear':2008,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
+    LowerWeather={'weatherstation':'LowerWeather','startyear':2007,'endyear':2012,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
 
     #something wrong with scr data
 
-    stationstats=LDP
+    stationstats=BRW
     plotyearlyPET=True
     saveyearlyPET=True
 

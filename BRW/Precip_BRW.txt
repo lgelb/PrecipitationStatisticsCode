@@ -1,8 +1,8 @@
-Calculated BRW averages using years 2013 to 2014 
+Calculated BRW averages using years 2012 to 2014 
 skipped 2010, missing precip data
  
-elevation at BRW is 2114 m                S (hrs)  IS (hrs/days)      D (mm)    num S
+                S (hrs)  IS (hrs/days)      D (mm)    num S
 ------------  ---------  ---------------  --------  -------
-wet season         2.21  62.83/2.62           4.2       200
-dry season         1.42  135.52/5.65          3.3        31
-year average       2.1   72.58/3.02           4.08      231
+wet season         4.53  56.32/2.35           4.27      158
+dry season         1.4   192.71/8.03          3.22       17
+year average       4.22  69.92/2.91           4.16      175

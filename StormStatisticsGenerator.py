@@ -24,7 +24,6 @@ to use:
 
 flaws:
     -this code does not deal with storms overlapping seasons
-    -cannot currently deal with missing data (-6999), manually ignore those years
     -some files have 24 rows of ",,,,,,,,,,,,,," at the end (1 day). Not sure why,
     but I manually deleted these rows. If you don't, you get: "ValueError: could
     not convert string to float:"
@@ -37,17 +36,15 @@ import numpy,pylab,os
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 
-'''these must be adjust manually'''
+LowerWeather={'weatherstation':'LowerWeather','startyear':1999,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
+Treeline={'weatherstation':'Treeline','startyear':1999,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
+SCR={'weatherstation':'SCR','startyear':2010,'endyear':2013,'z':1720,'latitude':43.71105,'longitude':-116.09912}
+LDP={'weatherstation':'LDP','startyear':2007,'endyear':2014,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+BRW={'weatherstation':'BRW','startyear':2012,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
 
-BRW={'weatherstation':'BRW','startyear':2013,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
-LDP={'weatherstation':'LDP','startyear':2010,'endyear':2013,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
-Treeline={'weatherstation':'Treeline','startyear':2008,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
-SCR={'weatherstation':'SCR','startyear':2011,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
-LowerWeather={'weatherstation':'LowerWeather','startyear':2008,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
-
-weatherstation=BRW
-startyear=weatherstation['startyear']
-endyear=weatherstation['endyear']
+'''-----------------------------'''
+'''---adjust these as needed----'''
+weatherstation=SCR
 # adjust these manually based your needs
 begSummer=4104
 endSummer=6480
@@ -55,6 +52,8 @@ endSummer=6480
 stormthreshold=1 # (0.5 was used as the daily threshold)
 '''-----------------------------'''
 
+startyear=weatherstation['startyear']
+endyear=weatherstation['endyear']
 #initialize empty arrays, w=wet season, d=dry season
 #units are hours and mm
 w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
@@ -77,6 +76,10 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     #reads in one year's precip data, skipping 20 header rows,\
     precipHourly= numpy.loadtxt(filename,delimiter=",", \
         usecols=[1],skiprows=20,unpack=True)
+
+    for i,elem in enumerate(precipHourly):
+        if precipHourly[i]==-6999:
+            precipHourly[i]=numpy.NAN
 
     #initialize temporary variables
     templength=0
@@ -154,21 +157,21 @@ pylab.savefig(os.path.join(weatherstation['weatherstation'],'Precip_{}.svg'.form
                     weatherstation['weatherstation'])), bbox_inches="tight",format='svg')
 
 #wetseason statistics
-w_mustormlength = numpy.mean(w_stormlength)
-w_mustormdepth = numpy.mean(w_stormdepth)
-w_muinterstorm = numpy.mean(w_interstorm)
+w_mustormlength = numpy.nanmean(w_stormlength)
+w_mustormdepth = numpy.nanmean(w_stormdepth)
+w_muinterstorm = numpy.nanmean(w_interstorm)
 w_mustormcount = w_stormcount/numyears
 
 #dry season statistics
-d_mustormlength = numpy.mean(d_stormlength)
-d_mustormdepth = numpy.mean(d_stormdepth)
-d_muinterstorm = numpy.mean(d_interstorm)
+d_mustormlength = numpy.nanmean(d_stormlength)
+d_mustormdepth = numpy.nanmean(d_stormdepth)
+d_muinterstorm = numpy.nanmean(d_interstorm)
 d_mustormcount = d_stormcount/numyears
 
 #yearly average statistics
-y_mustormlength = numpy.mean(w_stormlength+d_stormlength)
-y_mustormdepth = numpy.mean(w_stormdepth+d_stormdepth)
-y_muinterstorm = numpy.mean(w_interstorm+d_interstorm)
+y_mustormlength = numpy.nanmean(w_stormlength+d_stormlength)
+y_mustormdepth = numpy.nanmean(w_stormdepth+d_stormdepth)
+y_muinterstorm = numpy.nanmean(w_interstorm+d_interstorm)
 y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
 #create a table for easy formatting of output
@@ -190,7 +193,7 @@ with open(os.path.join(weatherstation['weatherstation'],"Precip_{}.txt".format( 
                     weatherstation['weatherstation'])), "w") as text_file:
     text_file.write("Calculated {} averages using years {} to {} \n".format( \
                     weatherstation['weatherstation'],startyear,endyear))
-    text_file.write("skipped 2010, missing precip data\n \n")
-    text_file.write("elevation at BRW is 2114 m")
     text_file.write(out)
 print out
+
+#if __name__ == '__main__':
