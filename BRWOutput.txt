@@ -1,8 +1,0 @@
-Calculated BRW averages using years 2013 to 2014 
-skipped 2011-2012, missing precip data 
-
-                S (hrs)  IS (hrs/days)      D (mm)    num S
-------------  ---------  ---------------  --------  -------
-wet season         2.22  58.03/2.42           4.24       98
-dry season         1.41  154.06/6.42          3.16       17
-year average       2.1   72.58/3.02           4.08      115

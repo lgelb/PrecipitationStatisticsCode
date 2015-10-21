@@ -10,6 +10,7 @@ and: http://edis.ifas.ufl.edu/ae459
 """
 
 import numpy, os, warnings, pandas
+from scipy import signal
 import matplotlib.pyplot as plt
 
 def pftPET_(pft,albedo):
@@ -26,6 +27,7 @@ def pftPET_(pft,albedo):
 
     #finds wet and dry season PET for each year
     (PETwet,PETdry)=seasonalPET_(PET)
+    print PETwet, PETdry
 
     output=range(stationstats['startyear'],stationstats['endyear']+1)
     output=numpy.vstack((output,PETwet,PETdry))
@@ -34,7 +36,7 @@ def pftPET_(pft,albedo):
 
     #saves calculated PET values in the weather station's folder as '<station>_PET_values.csv'
     if saveyearlyPET:
-        with open(os.path.join(stationstats['weatherstation'],('{}_PET_values.csv'.format(stationstats['weatherstation']))),'a') as text_file:
+        with open(os.path.join(stationstats['weatherstation'],('PET_{}.csv'.format(stationstats['weatherstation']))),'a') as text_file:
             text_file.write('\nPFT: {}\nyear,PETwet,PETdry\n'.format(pft))
             numpy.savetxt(text_file,output,delimiter=',',fmt=('%i','%8.3f','%8.3f'))
             text_file.write('wet season average = {:.3f}, dry season average = {:.3f}\n' \
@@ -76,15 +78,15 @@ def calcPET_(filename,stationstats,n,a):
     tempTmin=numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
     #daily net radiation in MJ/m2/dayF
     tempRs=(numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
-
     #average daily windspeed m/s
     tempU2=numpy.nanmean(windspeed.reshape(-1,24),axis=1)
+    tempU2[:]=numpy.nanmean(tempU2)
     ''' altered this to troubleshoot'''
-#    tempU2=numpy.full((365),numpy.nanmean(windspeed))
-    tempU2[tempU2>20]=0#numpy.NaN
-#    tempU2=pandas.rolling_median(tempU2,3)
-#    tempU2=pandas.rolling_median(tempU2,20)
-
+#    tempU2=numpy.full((365),numpy.nanmean(windspeed)) # mean hourly unstead of daily
+#    tempU2[tempU2>3]=0#numpy.NaN
+#    tempU2 = pandas.rolling_median(tempU2,14)
+#    tempU2 = scipy.signal.butter(1,(0.1,0.5),'bandpass')
+#    tempU2 = smoothed
 
 
     #slope of saturation vapor pressure curve
@@ -134,6 +136,7 @@ def calcPET_(filename,stationstats,n,a):
     #FINAL evaportranspiration value
     ETo=tempETwind+tempETrad
     ETo=ETo[0:365]
+ #   ETo[ETo>8]=numpy.NaN
 
     return ETo
 
@@ -180,7 +183,7 @@ def plotPET_(pft,dataArray,stationstats):
     plt.ylabel('PET (mm/day)')
     plt.legend(loc = 1)
     plt.title('daily {} PET at {}'.format(pft,stationstats['weatherstation']))
-    plt.savefig(os.path.join(stationstats['weatherstation'],('{}_{}_PET.svg'.format \
+    plt.savefig(os.path.join(stationstats['weatherstation'],('PET_{}_{}.svg'.format \
         (stationstats['weatherstation'],pft))),bbox_inches="tight",format='svg')
 
 if __name__ == '__main__':
@@ -188,21 +191,22 @@ if __name__ == '__main__':
 #    warnings.simplefilter("error")
 
     BRWtemp={'weatherstation':'BRWtemp','startyear':2012,'endyear':2014,'z':2114,'latitude':43.75876,'longitude':-116.090404} #z in m
-    LDP={'weatherstation':'LDP','startyear':2010,'endyear':2014,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
+    LDP={'weatherstation':'LDP','startyear':2010,'endyear':2013,'z':1850,'latitude':43.737078,'longitude':-116.1221131}
     Treeline={'weatherstation':'Treeline','startyear':2008,'endyear':2014,'z':1610,'latitude': 43.73019,'longitude':-116.140143}
     SCR={'weatherstation':'SCR','startyear':2011,'endyear':2014,'z':1720,'latitude':43.71105,'longitude':-116.09912}
     LowerWeather={'weatherstation':'LowerWeather','startyear':2008,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
 
     #something wrong with scr data
 
-    BRWtemp['startyear']=2014
+    BRWtemp['startyear']=2012
 
-    stationstats=BRWtemp
+    stationstats=LDP
     plotyearlyPET=True
-    saveyearlyPET=False
+    saveyearlyPET=True
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
+#    pftAlbedo={'grass':0.23} #this is for troubleshooting so you don't have 4 different plots crowding things up
     numyears = stationstats['endyear']-stationstats['startyear']+1 # +1 exclusinve
     PET=numpy.empty((365,numyears,))
     PET[:]=numpy.NaN

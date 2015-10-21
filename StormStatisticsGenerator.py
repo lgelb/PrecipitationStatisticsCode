@@ -15,7 +15,9 @@ to use:
     1)change weather station name to correspond with correct site
     2)run once to see the plot that shows when precip is occuring, then
     3)adjust dry/wet seasons to correspond with correct 'begSummer'
-    and 'endSummer' variables. You may also have to omit a year if precip
+    and 'endSummer' variables. I've used 171 (4104) and 270 (6480) below
+    as they are very close to observed and are the official JD end of
+    spring`and beginng of fall. You may also have to omit a year if precip
     data is not included for the calender year (common if a datalogger
     was installed in the spring)
     4)change txtfile.write to have correct notes in the output file
@@ -39,8 +41,8 @@ import matplotlib.pyplot as plt
 weatherstation="BRWtemp"
 startyear=2013
 endyear=2014
-begSummer=4000 #adjust these manually based on precip graph
-endSummer=6500
+begSummer=4104 #adjust these manually based your needs
+endSummer=6480
 stormthreshold=1 #precip to count as a storm: precim is in mm (0.5 was used as the daily threshold)
 '''-----------------------------'''
 
