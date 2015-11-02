@@ -197,12 +197,12 @@ if __name__ == '__main__':
 
     #something wrong with scr data
 
-    stationstats=BRW
+    stationstats=Treeline
     plotyearlyPET=True
     saveyearlyPET=True
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
-    pftAlbedo={'bare':0.17,'grass':0.23,'shrub':0.14,'tree':0.08}
+    pftAlbedo={'grass':0.23,'shrub':0.14,'tree':0.08} # 'bare':0.17
 #    pftAlbedo={'grass':0.23} #this is for troubleshooting so you don't have 4 different plots crowding things up
     numyears = stationstats['endyear']-stationstats['startyear']+1 # +1 exclusinve
     PET=numpy.empty((365,numyears,))

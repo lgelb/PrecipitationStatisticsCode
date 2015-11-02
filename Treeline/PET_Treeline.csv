@@ -1,4 +1,3 @@
-
 PFT: tree
 year,PETwet,PETdry
 1999,     nan,     nan
@@ -10,12 +9,12 @@ year,PETwet,PETdry
 2005,     nan,     nan
 2006,     nan,     nan
 2007,     nan,     nan
-2008,   1.499,   2.279
-2009,   1.341,   2.091
-2010,   1.307,   2.251
-2011,   1.226,   2.118
-2012,   1.418,   2.152
-wet season average = 1.358, dry season average = 2.178
+2008,   1.391,   2.139
+2009,   1.171,   1.871
+2010,   1.145,   1.987
+2011,   1.136,   1.926
+2012,   1.295,   1.950
+wet season average = 1.227, dry season average = 1.974
 
 PFT: grass
 year,PETwet,PETdry
@@ -28,30 +27,13 @@ year,PETwet,PETdry
 2005,     nan,     nan
 2006,     nan,     nan
 2007,     nan,     nan
-2008,   1.440,   2.136
-2009,   1.282,   1.942
-2010,   1.256,   2.108
-2011,   1.167,   1.962
-2012,   1.356,   2.024
-wet season average = 1.300, dry season average = 2.034
+2008,   1.329,   1.993
+2009,   1.093,   1.717
+2010,   1.083,   1.838
+2011,   1.051,   1.764
+2012,   1.209,   1.818
+wet season average = 1.153, dry season average = 1.826
 
-PFT: bare
-year,PETwet,PETdry
-1999,     nan,     nan
-2000,     nan,     nan
-2001,     nan,     nan
-2002,     nan,     nan
-2003,     nan,     nan
-2004,     nan,     nan
-2005,     nan,     nan
-2006,     nan,     nan
-2007,     nan,     nan
-2008,   1.464,   2.193
-2009,   1.306,   2.002
-2010,   1.277,   2.165
-2011,   1.191,   2.024
-2012,   1.381,   2.075
-wet season average = 1.323, dry season average = 2.092
 
 PFT: shrub
 year,PETwet,PETdry
@@ -64,9 +46,9 @@ year,PETwet,PETdry
 2005,     nan,     nan
 2006,     nan,     nan
 2007,     nan,     nan
-2008,   1.476,   2.222
-2009,   1.317,   2.032
-2010,   1.287,   2.194
-2011,   1.202,   2.055
-2012,   1.393,   2.101
-wet season average = 1.335, dry season average = 2.121
+2008,   1.366,   2.080
+2009,   1.140,   1.809
+2010,   1.117,   1.928
+2011,   1.100,   1.861
+2012,   1.258,   1.897
+wet season average = 1.196, dry season average = 1.915
