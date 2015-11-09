@@ -35,9 +35,10 @@ def pftPET_(pft,albedo):
 
     #saves calculated PET values in the weather station's folder as '<station>_PET_values.csv'
     if saveyearlyPET:
-        with open(os.path.join(stationstats['weatherstation'],('PET_{}.csv'.format(stationstats['weatherstation']))),'a') as text_file:
-            text_file.write('\nPFT: {}\nyear,PETwet,PETdry\n'.format(pft))
-            numpy.savetxt(text_file,output,delimiter=',',fmt=('%i','%8.3f','%8.3f'))
+        with open(os.path.join(stationstats['weatherstation'],
+                  ('PET_{}.csv'.format(stationstats['weatherstation']))),
+                  'a') as text_file:
+            text_file.write('\nPFT: {}\n'.format(pft))
             text_file.write('wet season average = {:.3f}, dry season average = {:.3f}\n' \
                 .format(totmeans[1],totmeans[2]))
 
@@ -65,7 +66,6 @@ def calcPET_(filename,stationstats,n,a):
     missingData= checkMissingData_(precipHourly,temperatureC,solarradiation, \
         netradiation,relativehumidity, winddirectiondegree,windspeed,snowdepthcm)
     if missingData == True:
-        print 'missing data for year {}'.format(stationstats['startyear']+n)
         ETo=[numpy.nan]*365
         return ETo
 
@@ -197,8 +197,8 @@ if __name__ == '__main__':
 
     #something wrong with scr data
 
-    stationstats=BRW
-    plotyearlyPET=True
+    stationstats=LDP
+    plotyearlyPET=False
     saveyearlyPET=True
 
     #albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
