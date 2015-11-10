@@ -1,6 +1,4 @@
 Calculated Treeline averages using years 1999 to 2014 
-skipped 2010, missing precip data
- 
                 S (hrs)  IS (hrs/days)      D (mm)    num S
 ------------  ---------  ---------------  --------  -------
 wet season         4.38  71.41/2.98           4.73       92

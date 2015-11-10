@@ -44,7 +44,7 @@ BRW={'weatherstation':'BRW','startyear':2012,'endyear':2014,'z':2114,'latitude':
 
 '''-----------------------------'''
 '''---adjust these as needed----'''
-weatherstation=SCR
+weatherstation=Treeline
 # adjust these manually based your needs
 begSummer=4104
 endSummer=6480
