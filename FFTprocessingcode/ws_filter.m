@@ -2,7 +2,7 @@
 % a fast fourier transformation and a weighting function to pull out an
 % overall trend.
 
-data = load('wind_speed.dat');
+data = load('wind_speed.csv');
 tm = data(:,1);     % time vector
 s = data(:,2);      % wind speed signal
 npts = length(tm);
@@ -28,7 +28,7 @@ plot(frq,abs(hk),'g','linewidth',2);		% plot fft in frequency domain
 xlabel('frequency');
 ylabel('Amplitude of FFT');
 title('Amplitude of FFT','fontsize',18);
-pause;
+% pause;
 
 df = 1/(npts*dt);
 f = 5;                        % picked cutoff frequency (from inspection)
@@ -36,7 +36,7 @@ Jc = floor((f/df)+1);				% define cutoff frequency
 W = zeros(npts,1);				% initialize weighting vector
 W(1) = 1;
 for J = 2:Jc
-	W(J) = 1;		
+	W(J) = 1; 		
 	K = npts+2-J;				% fill up weighting vector
 	W(K) = 1;	
 end
@@ -59,3 +59,5 @@ xlabel('time (s)');
 ylabel('amplitude');
 title('Windowed signal, time domain','fontsize',18);
 xlim([min(tm) max(tm)]);
+
+
