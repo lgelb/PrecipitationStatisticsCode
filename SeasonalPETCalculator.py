@@ -6,11 +6,13 @@ mm/day for that area based on 4 different pfts (bare,grass,shrub,tree)
 thanks to: http://edis.ifas.ufl.edu/pdffiles/ae/ae45900.pdf
 and: http://www.luiw.ethz.ch/labor2/experimente/exp4/Presentation/Net_Longwave_Radiation
 and: http://edis.ifas.ufl.edu/ae459
+
+if you get list index out of range errors when using loadtxt, open the
+offending file and replace all cells that are '#VALUE!' with '-6999'
 @author: lucyB570
 """
 
-import numpy, os, warnings, pandas
-from scipy import signal
+import numpy, os, warnings
 import matplotlib.pyplot as plt
 
 
@@ -18,10 +20,12 @@ def pftPET_(pft, albedo):
 
     # gets daily PET for all years
     for n in range(numyears):  # +1 exclusive
+        # creates filename (add n to base year to cycle through years)
         filename = os.path.join(stationstats['weatherstation'],
                                 "{}_HrlySummary_{}.csv".format(
                                 stationstats['weatherstation'],
                                 (n+stationstats['startyear'])))
+        # calculates yearly PET
         PET[:, (n)] = calcPET_(filename, stationstats, n, albedo)
 
     if plotyearlyPET:
@@ -39,10 +43,10 @@ def pftPET_(pft, albedo):
     # '<station>_PET_values.csv'
     if saveyearlyPET:
         with open(os.path.join(stationstats['weatherstation'],
-                  ('PET_{}.csv'.format(stationstats['weatherstation']))),
+                  ('PET_{}.txt'.format(stationstats['weatherstation']))),
                   'a') as text_file:
             text_file.write('\nPFT: {}\n'.format(pft))
-            text_file.write('wet season average = {:.3f},'.format(totmeans[1]))
+            text_file.write('wet season average = {:.3f}, '.format(totmeans[1]))
             text_file.write('dry season average = {:.3f}\n'.format(totmeans[2]))
 
 
@@ -127,8 +131,11 @@ def calcPET_(filename, stationstats, n, a):
     tempRs = (numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
     # average daily windspeed m/s
     tempU2 = numpy.nanmean(windspeed.reshape(-1, 24), axis=1)
+
     # fast fourier transform, cutoffFrequency = 5 seems best
-    tempU2 = windspeedFFT_(tempU2, 5)
+#    tempU2 = windspeedFFT_(tempU2, 5)
+
+    tempU2[:] = numpy.nanmedian(tempU2)
 
     # slope of saturation vapor pressure curve
     tempIhat = (4098*(0.6108**((17.21*tempTmean)/(
@@ -250,29 +257,34 @@ def plotPET_(pft, dataArray, stationstats):
 
 if __name__ == '__main__':
 
-    BRW = {'weatherstation': 'BRWtemp', 'startyear': 2012, 'endyear': 2014,
+#    warnings.simplefilter("error")
+
+    BRW = {'weatherstation': 'BRW', 'startyear': 2011, 'endyear': 2014,
            'z': 2114, 'latitude': 43.75876, 'longitude': -116.090404}  # z in m
+    # 2014 LDP is off
     LDP = {'weatherstation': 'LDP', 'startyear': 2007, 'endyear': 2013,
            'z': 1850, 'latitude': 43.737078, 'longitude': -116.1221131}
     Treeline = {'weatherstation': 'Treeline', 'startyear': 1999,
                 'endyear': 2014, 'z': 1610, 'latitude': 43.73019,
                 'longitude': -116.140143}
-    SCR = {'weatherstation': 'SCR', 'startyear': 2011, 'endyear': 2014,
+    # 2010 of SCR is empty,
+    SCR = {'weatherstation': 'SCR', 'startyear': 2010, 'endyear': 2013,
            'z': 1720, 'latitude': 43.71105, 'longitude': -116.09912}
-    LowerWeather = {'weatherstation': 'LowerWeather', 'startyear': 2007,
+    # 2013 and 2014 of Lower Weather are off
+    LowerWeather = {'weatherstation': 'LowerWeather', 'startyear': 1999,
                     'endyear': 2012, 'z': 1120, 'latitude': 43.6892464,
                     'longitude': -116.1696892}
 
     '''something wrong with scr data'''
 
-    stationstats = Treeline
+    stationstats = SCR
     plotyearlyPET = True
     saveyearlyPET = False
 
     # albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo = {'grass': 0.23, 'shrub': 0.14, 'tree': 0.08}  # 'bare':0.17
-#    # this is for troubleshooting so you don't have 4 different plots
-#    # crowding things up
+    # this is for troubleshooting so you don't have 4 different plots
+    # crowding things up
 #    pftAlbedo={'grass':0.23}
 
     # # +1 exclusinve indexing

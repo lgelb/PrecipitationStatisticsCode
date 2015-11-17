@@ -195,5 +195,3 @@ with open(os.path.join(weatherstation['weatherstation'],"Precip_{}.txt".format( 
                     weatherstation['weatherstation'],startyear,endyear))
     text_file.write(out)
 print out
-
-#if __name__ == '__main__':

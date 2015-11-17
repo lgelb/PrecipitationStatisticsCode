@@ -1,49 +1,9 @@
 
 PFT: tree
-year,PETwet,PETdry
-2012,   1.474,   2.736
-2013,   1.594,   2.424
-2014,   1.429,   2.464
-wet season average = 1.499, dry season average = 2.541
-
-PFT: grass
-year,PETwet,PETdry
-2012,   1.436,   2.574
-2013,   1.556,   2.263
-2014,   1.388,   2.294
-wet season average = 1.460, dry season average = 2.377
-
-PFT: bare
-year,PETwet,PETdry
-2012,   1.451,   2.639
-2013,   1.571,   2.328
-2014,   1.404,   2.362
-wet season average = 1.475, dry season average = 2.443
+wet season average = 1.372, dry season average = 2.211
 
 PFT: shrub
-year,PETwet,PETdry
-2012,   1.459,   2.671
-2013,   1.578,   2.360
-2014,   1.412,   2.396
-wet season average = 1.483, dry season average = 2.476
-
-PFT: tree
-year,PETwet,PETdry
-2012,   1.303,   2.497
-2013,   1.372,   2.211
-2014,   1.239,   2.195
-wet season average = 1.305, dry season average = 2.301
+wet season average = 1.350, dry season average = 2.145
 
 PFT: grass
-year,PETwet,PETdry
-2012,   1.252,   2.330
-2013,   1.322,   2.046
-2014,   1.183,   2.020
-wet season average = 1.252, dry season average = 2.132
-
-PFT: bare
-year,PETwet,PETdry
-2012,   1.274,   2.397
-2013,   1.337,   2.112
-2014,   1.211,   2.090
-wet season average = 1.274, dry season average = 2.200
+wet season average = 1.322, dry season average = 2.046
