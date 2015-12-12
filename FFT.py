@@ -27,7 +27,7 @@ LowerWeather = {'weatherstation': 'LowerWeather', 'startyear': 1999,
 
 stationstats = Treeline
 numyears = stationstats['endyear']-stationstats['startyear']+1
-cutoffFrequency = 5
+cutoffFrequency = 12
 
 for n in range(numyears):
 
@@ -42,9 +42,17 @@ for n in range(numyears):
                    skiprows=20, unpack=True)
 
     data = windspeed
+    
+    # this converts missing data to Nans
     for i, elem in enumerate(data):
         if data[i] == -6999:
             data[i] = numpy.NAN
+    #this interpolates to fill in missing data
+    '''it doesn't matter if this is correct or not, because within the PET
+    calculator days with missing data aren't calculated at all'''
+    xi = numpy.arange(len(data))
+    mask = numpy.isfinite(data)
+    data = numpy.interp(xi, xi[mask], data[mask])
 
     tm = [i for i in range(len(data))]  # time vector
     npts = len(tm)
@@ -72,7 +80,8 @@ for n in range(numyears):
     wind_sig_tm = abs(numpy.fft.ifft(windowed_signal))
 
     if max(wind_sig_tm) < 10:
-        break
+        print('yes')        
+        # break
     else:
         # zero out weighting factor again
         W = numpy.zeros(npts)  # weighting vector
@@ -83,8 +92,8 @@ for n in range(numyears):
         # inverse fft to go back to time domain
         wind_sig_tm = abs(numpy.fft.ifft(windowed_signal))
     # if neither top nor bottom work
-    if max(wind_sig_tm) >10:
-        break
+#    if max(wind_sig_tm) > 10:
+#        break
 
     # windowed signal in the time domain
     plt.figure()
