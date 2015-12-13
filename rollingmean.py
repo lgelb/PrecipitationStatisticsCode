@@ -27,11 +27,11 @@ LowerWeather = {'weatherstation': 'LowerWeather', 'startyear': 1999,
                 'endyear': 2012, 'z': 1120, 'latitude': 43.6892464,
                 'longitude': -116.1696892}
 
-stationstats = Treeline
+stationstats = SCR
 numyears = stationstats['endyear']-stationstats['startyear']+1
 N = 12
 
-for n in range(1):
+for n in range(numyears):
 
     filename = os.path.join(stationstats['weatherstation'],
                             "{}_HrlySummary_{}.csv".format(
@@ -61,7 +61,7 @@ for n in range(1):
         y[ctr] = np.sum(data[ctr:(ctr+N)])
     final = y/N
 
-    final = numpy.nanmin(final.reshape(-1, 24), axis=1)
+    final = numpy.nanmedian(final.reshape(-1, 24), axis=1)
 
     plt.figure()
     plt.plot(final)

@@ -1,9 +1,9 @@
 
-PFT: shrub
-wet season average = nan, dry season average = nan
-
 PFT: grass
-wet season average = nan, dry season average = nan
+wet season average = 1.643, dry season average = 2.204
 
 PFT: tree
-wet season average = nan, dry season average = nan
+wet season average = 1.719, dry season average = 2.346
+
+PFT: shrub
+wet season average = 1.689, dry season average = 2.289

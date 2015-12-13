@@ -1,0 +1,9 @@
+
+PFT: grass
+wet season average = 1.477, dry season average = 2.377
+
+PFT: tree
+wet season average = 1.527, dry season average = 2.541
+
+PFT: shrub
+wet season average = 1.509, dry season average = 2.476

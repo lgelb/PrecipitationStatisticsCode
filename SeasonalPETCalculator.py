@@ -20,7 +20,7 @@ You will get 'RuntimeWarning: Mean of empty slice warnings.warn("Mean of empty
 slice", RuntimeWarning)' once for each year with missing data, *3 for each PFT
 
 Irregular windspeed causes lots of data irregularities, mostly PET spikes. To
-deal with this I've held windspeed (U2) constant over a year as its median. The
+deal with this I've held windspeed (U2) constant over a year as its mean. The
 code below also includes a roling mean and FFT function, but those are not as
 reliable.
 
@@ -125,9 +125,10 @@ def calcPET_(filename, stationstats, n, a):
 #    tempU2 = rollingMedian_(windspeed, 24) # still get spikes, might be better if switch median for mean
 
     # constant median (reshape before)
-    tempU2 = numpy.nanmedian(windspeed.reshape(-1, 24), axis=1)
+    tempU2 = numpy.nanmean(windspeed.reshape(-1, 24), axis=1)
     # finds median value for whole year
-    tempU2[:] = numpy.nanmedian(tempU2)
+    tempU2[:] = numpy.nanmean(tempU2)
+    '''option changes end here'''
 
     # slope of saturation vapor pressure curve
     tempIhat = (4098*(0.6108**((17.21*tempTmean)/(
@@ -328,8 +329,8 @@ if __name__ == '__main__':
 
     '''something funny with scr data'''
 
-    stationstats = Treeline
-    plotyearlyPET = False
+    stationstats = BRW
+    plotyearlyPET = True
     saveyearlyPET = True
 
     # albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
