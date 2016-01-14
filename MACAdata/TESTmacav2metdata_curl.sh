@@ -1,1 +1,0 @@
-curl -O "http://climate.nkn.uidaho.edu/Services/get-netcdf-data/?download-csv=True&lat=43.73019&lon=-116.140143&positive-east-longitude=True&data-path=http://thredds.northwestknowledge.net:8080/thredds/dodsC/MACAV2/CanESM2/macav2metdata_pr_CanESM2_r1i1p1_rcp45_2006_2010_CONUS_daily.nc&variable=precipitation&variable-name=pr"
