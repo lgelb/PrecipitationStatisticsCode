@@ -37,8 +37,6 @@ by_date = tasmin.groupby('monthday')
 # average min temp by day of year
 dailymin = by_date.mean()
 
-
-
 '''finds daily max temperature'''
 tasmax = pandas.DataFrame()
 for i, elem in enumerate(tasmax_files):
@@ -62,7 +60,12 @@ by_date = tasmax.groupby('monthday')
 # average min temp by day of year
 dailymax = by_date.mean()
 
+'''finds daily mean temperature'''
+dailymean = pandas.concat((dailymax, dailymin), axis=1)
+dailymean = dailymean.mean(axis=1)
+
 '''plotting just to check'''
 ax = dailymin.plot()
+dailymean.plot(ax=ax)
 dailymax.plot(ax=ax)
 ax.set_ylabel('temperature (*C)')

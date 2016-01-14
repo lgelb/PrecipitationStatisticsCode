@@ -330,7 +330,7 @@ if __name__ == '__main__':
 
     stationstats = BRW
     plotyearlyPET = True
-    saveyearlyPET = True
+    saveyearlyPET = False
     temperature = 'inc'  # increased or decreased temperature model scenario
     # precipitation is not used in the calculation, so it doesn not need to be
     # adjusted along with temperature
