@@ -34,6 +34,7 @@ def pftPET_(pft, albedo):
 
     # gets daily PET for all years
     for n in range(numyears):  # +1 exclusive
+        print(n)
         # creates filename
         filename = os.path.join(stationstats['weatherstation'],
                                 "{}_HrlySummary_{}.csv".format(
@@ -103,18 +104,13 @@ def calcPET_(filename, stationstats, n, a):
         ETo = [numpy.nan]*365
         return ETo
 
-    # average daily temp
-    tempTmean = numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
-    # max daily temp
-    tempTmax = numpy.nanmax(temperatureC.reshape(-1, 24), axis=1)
-    # min daily temp
-    tempTmin = numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
-    # daily net radiation in MJ/m2/dayF
-    tempRs = (numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
-
     ''' To get windspeed: either use FFT, rolling mean, or constant median.
         Comment out the unused options.'''
-
+    # constant median (reshape before)
+    tempU2 = numpy.nanmean(windspeed.reshape(-1, 24), axis=1)
+    # finds median value for whole year
+    tempU2[:] = numpy.nanmean(tempU2)
+    '''option changes end here'''
 #    # FFT (reshape before FFT function_)
 #    tempU2 = numpy.nanmean(windspeed.reshape(-1, 24), axis=1)
 #    # fast fourier transform, cutoffFrequency = 5 seems best
@@ -123,11 +119,36 @@ def calcPET_(filename, stationstats, n, a):
 #    # rolling mean (needs no reshape)
 #    tempU2 = rollingMedian_(windspeed, 24) # still get spikes, might be better if switch median for mean
 
-    # constant median (reshape before)
-    tempU2 = numpy.nanmean(windspeed.reshape(-1, 24), axis=1)
-    # finds median value for whole year
-    tempU2[:] = numpy.nanmean(tempU2)
-    '''option changes end here'''
+    # if MACA data is being used, load min/mean/max temp and precip
+    # no need to worry about precip data, since it's not a used variable
+    if useMACAdata:
+        startday = 365*n
+        # reads in all average daily temp values
+        tempTmean = numpy.loadtxt('MACAdata\\MACAdailymeanC.csv',
+                                  delimiter=",", usecols=[1])
+        # cuts it down to the needed year
+        tempTmean = tempTmean[startday:startday+len(tempU2)]
+        # max daily temp
+        tempTmax = numpy.loadtxt('MACAdata\\MACAdailymaxC.csv', delimiter=",",
+                                 usecols=[1], skiprows=1)
+        # cuts it down to the needed years
+        tempTmax = tempTmax[startday:startday+len(tempU2)]
+        # min daily temp
+        tempTmin = numpy.loadtxt('MACAdata\\MACAdailyminC.csv', delimiter=",",
+                                 usecols=[1], skiprows=1)
+        # cuts it down to the needed years
+        tempTmin = tempTmin[startday:startday+len(tempU2)]
+    # else, use the weatherstation's measured temps
+    else:
+        # average daily temp
+        tempTmean = numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
+        # max daily temp
+        tempTmax = numpy.nanmax(temperatureC.reshape(-1, 24), axis=1)
+        # min daily temp
+        tempTmin = numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
+
+    # daily net radiation in MJ/m2/dayF
+    tempRs = (numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
 
     # slope of saturation vapor pressure curve
     tempIhat = (4098*(0.6108**((17.21*tempTmean)/(
@@ -328,9 +349,10 @@ if __name__ == '__main__':
 
     '''something funny with scr data'''
 
-    stationstats = BRW
+    stationstats = Treeline
     plotyearlyPET = True
-    saveyearlyPET = False
+    saveyearlyPET = True
+    useMACAdata = True
     temperature = 'inc'  # increased or decreased temperature model scenario
     # precipitation is not used in the calculation, so it doesn not need to be
     # adjusted along with temperature

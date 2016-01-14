@@ -30,10 +30,10 @@ for i, elem in enumerate(tasmin_files):
     # adds data to main dataframe
     tasmin = tasmin.append(df)
 
-# strip out year
-tasmin['monthday'] = tasmin['date'].map(lambda x: x[5:])
+## strip out year
+#tasmin['monthday'] = tasmin['date'].map(lambda x: x[5:])
 # group by day of year
-by_date = tasmin.groupby('monthday')
+by_date = tasmin.groupby('date')
 # average min temp by day of year
 dailymin = by_date.mean()
 
@@ -53,14 +53,15 @@ for i, elem in enumerate(tasmax_files):
     # adds data to main dataframe
     tasmax = tasmax.append(df)
 
-# strip out year
-tasmax['monthday'] = tasmax['date'].map(lambda x: x[5:])
+## strip out year
+#tasmax['monthday'] = tasmax['date'].map(lambda x: x[5:])
 # group by day of year
-by_date = tasmax.groupby('monthday')
+by_date = tasmax.groupby('date')
 # average min temp by day of year
 dailymax = by_date.mean()
 
 '''finds daily mean temperature'''
+# dailymean.columns = ['date','meantemp']  # doesn't work for some reason?
 dailymean = pandas.concat((dailymax, dailymin), axis=1)
 dailymean = dailymean.mean(axis=1)
 
@@ -69,3 +70,9 @@ ax = dailymin.plot()
 dailymean.plot(ax=ax)
 dailymax.plot(ax=ax)
 ax.set_ylabel('temperature (*C)')
+
+'''saves all to csv file'''
+# temperature is in Celcius, and rounded to 2 decimal points
+dailymin.to_csv('MACAdailyminC.csv', float_format='%.2f')
+dailymax.to_csv('MACAdailymaxC.csv', float_format='%.2f')
+dailymean.to_csv('MACAdailymeanC.csv', float_format='%.2f')
