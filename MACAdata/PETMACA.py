@@ -11,8 +11,8 @@ import pandas
 import glob
 
 # creates a list of all available model csvs'
-tasmin_files = glob.glob('agg_macav2metdata_tasmin_*')
-tasmax_files = glob.glob('agg_macav2metdata_tasmax_*')
+tasmin_files = glob.glob('RCP45\\agg_macav2metdata_tasmin_*')
+tasmax_files = glob.glob('RCP45\\agg_macav2metdata_tasmax_*')
 
 '''finds daily min temperature'''
 tasmin = pandas.DataFrame()
