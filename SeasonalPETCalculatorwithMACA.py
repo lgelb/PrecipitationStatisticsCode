@@ -124,20 +124,15 @@ def calcPET_(filename, stationstats, n, a):
     if useMACAdata:
         startday = 365*n
         # reads in all average daily temp values
-        tempTmean = numpy.loadtxt('MACAdata\\MACAdailymeanC.csv',
-                                  delimiter=",", usecols=[1])
-        # cuts it down to the needed year
+        csv = numpy.genfromtxt('MACAdata\\MODTreelineDCEW.csv', delimiter=",")
+        tempTmin  = csv[:, 5]
+        tempTmax  = csv[:, 6]
+        tempTmean = csv[:, 7]
+        # cuts it down to the needed years
+        tempTmin  = tempTmin[startday:startday+len(tempU2)]
+        tempTmax  = tempTmax[startday:startday+len(tempU2)]
         tempTmean = tempTmean[startday:startday+len(tempU2)]
-        # max daily temp
-        tempTmax = numpy.loadtxt('MACAdata\\MACAdailymaxC.csv', delimiter=",",
-                                 usecols=[1], skiprows=1)
-        # cuts it down to the needed years
-        tempTmax = tempTmax[startday:startday+len(tempU2)]
-        # min daily temp
-        tempTmin = numpy.loadtxt('MACAdata\\MACAdailyminC.csv', delimiter=",",
-                                 usecols=[1], skiprows=1)
-        # cuts it down to the needed years
-        tempTmin = tempTmin[startday:startday+len(tempU2)]
+
     # else, use the weatherstation's measured temps
     else:
         # average daily temp
@@ -365,6 +360,9 @@ if __name__ == '__main__':
     # crowding things up
 #    pftAlbedo={'grass':0.23}
 
+    if useMACAdata:
+        stationstats['startyear'] = 1999
+        stationstats['endyear'] = 2005
     # # +1 exclusinve indexing
     numyears = stationstats['endyear']-stationstats['startyear']+1
     PET = numpy.empty((365, numyears,))

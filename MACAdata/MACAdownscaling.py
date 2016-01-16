@@ -2,8 +2,8 @@
 """
 
 Created on Fri Jan 15 10:56:49 2016
-This code reads in historical modeled and measured data for Treeline in DCEW
-and finds the correction needed to bias correct the ensemble of MACA models
+This codes compares MACA historical to forecasted data (by Month) and then
+applies that relationship to DCEW observed data to get DCEW forecasted
 
 @author: Lucy
 """
@@ -12,99 +12,114 @@ import glob
 import os
 import numpy
 
-# creates a list of all available model csvs'
-tasmin_files = glob.glob('historical\\agg_macav2metdata_tasmin_*')
-tasmax_files = glob.glob('historical\\agg_macav2metdata_tasmax_*')
 
-'''MACA daily min temperature'''
-tasmin = pandas.DataFrame()
-for i, elem in enumerate(tasmin_files):
+def diffchecker(variable):
 
-    # reads in one model's data for 100 years
-    df = pandas.read_csv(tasmin_files[i], names=['date', 'mintemp'],
-                         sep=",", skiprows=8)
-    # deletes data so only use 2070-2099
-    df = df[df.date > '1998-12-31']
-#    # deletes leap days (Feb 29th)
-#    df = df[~df["date"].str.contains('02-29')]
-    # converts from kelvin to celcius
-    df['mintemp'] = df['mintemp']-273.15
-    # adds data to main dataframe
-    tasmin = tasmin.append(df)
-# group mins by day
-by_date = tasmin.groupby('date')
-# average min temp by day of year
-minmodeled = by_date.mean()
+    '''this function finds the monthly difference between MACA historical and
+    modeled data'''
 
+    '''MACA modeled historical data'''
+    # creates a list of all available model csvs'
+    files = glob.glob('historical\\agg_macav2metdata_{}_*'.format(variable))
 
-'''MACA daily max temperture'''
-tasmax = pandas.DataFrame()
-for i, elem in enumerate(tasmax_files):
+    histMOD = pandas.DataFrame()
+    for i, elem in enumerate(files):
+        # reads in one model's data for 100 years
+        df = pandas.read_csv(files[i], names=['doy', 'historical'],
+                             sep=",", skiprows=8)
+        # deletes data so only use 1999-2005
+        df = df[df.doy > '1998-12-31']
+        # converts from kelvin to celcius
+        df['historical'] = df['historical']-273.15
+        # adds data to main dataframe
+        histMOD = histMOD.append(df)
+    # strip out year
+    histMOD['month'] = histMOD['doy'].map(lambda x: x[5:7])
+    # group by month
+    by_doy = histMOD.groupby('month')
+    # average data value by month
+    histMODmonth = by_doy.mean()
 
-    # reads in one model's data for 100 years
-    df = pandas.read_csv(tasmax_files[i], names=['date', 'maxtemp'],
-                         sep=",", skiprows=8)
-    # deletes data so only use 2070-2099
-    df = df[df.date > '1998-12-31']
-#    # deletes leap days (Feb 29th)
-#    df = df[~df["date"].str.contains('02-29')]
-    # converts from kelvin to celcius
-    df['maxtemp'] = df['maxtemp']-273.15
-    # adds data to main dataframe
-    tasmax = tasmax.append(df)
-# group maxs by day
-by_date = tasmax.groupby('date')
-# average min temp by day of year
-maxmodeled = by_date.mean()
+    '''MACA modeled forcasting data'''
+    # creates a list of all available model csvs'
+    files = glob.glob('RCP45\\agg_macav2metdata_{}_*'.format(variable))
+    rcp45MOD = pandas.DataFrame()
+    for i, elem in enumerate(files):
+        # reads in one model's data for 100 years
+        df = pandas.read_csv(files[i], names=['doy', 'rcp45'],
+                             sep=",", skiprows=8)
+        # deletes data so only use 1999-2005
+        df = df[df.doy > '1998-12-31']
+        # converts from kelvin to celcius
+        df['rcp45'] = df['rcp45']-273.15
+        # adds data to main dataframe
+        rcp45MOD = rcp45MOD.append(df)
+    # strip out year
+    rcp45MOD['month'] = rcp45MOD['doy'].map(lambda x: x[5:7])
+    # group by month
+    by_doy = rcp45MOD.groupby('month')
+    # average data value by month
+    rcp45MODmonth = by_doy.mean()
 
-'''DCEW historical measured data'''
-# loads in historical Treeline measured data that corrsponds with MACA
-DCEW_files = glob.glob(os.path.join(os.pardir,
-                                    'Treeline\\Treeline_HrlySummary_*'))
-# arrays to hold successive years worth of daily min/maxs
-amin = []
-amax = []
-# loops through files 199-2005 (0-7), which have complete data
-for i in range(7):
+    '''difference between the two'''
+    diff = pandas.DataFrame()
+    diff['diff'] = rcp45MODmonth['rcp45'] - histMODmonth['historical']
 
-    # reads in 1 year's hourly temp data
-    a = numpy.loadtxt(DCEW_files[i], delimiter=',', skiprows=20,
-                      usecols=[2])
-    # converts missing data to NaNs
-    a[a == -6999.0] = numpy.nan
-    # find daily min, append it to main array
-    amin = numpy.append(amin, numpy.nanmin(a.reshape(-1, 24), axis=1))
-    # find daily max, apped it to main array
-    amax = numpy.append(amax, numpy.nanmax(a.reshape(-1, 24), axis=1))
-# convert those arrays to data frames for easier manipulation
-minmeasured = pandas.DataFrame(index=minmodeled.index,
-                               data=amin, columns=['mintemp'])
-maxmeasured = pandas.DataFrame(index=maxmodeled.index,
-                               data=amax, columns=['maxtemp'])
+    '''plotting just to check'''
+    #ax = rcp45MODmonth.plot(title='monthly MACA ensemble averages (min temp)')
+    #histMODmonth.plot(ax=ax)
+    #diff.plot(ax=ax)
+    #ax.set_ylabel('temperature (*C)')
+    
+    return diff, rcp45MOD
 
-'''find the difference between measured and modelled'''
-mindifference = minmeasured.subtract(minmodeled, axis = 'mintemp')
-maxdifference = maxmeasured.subtract(maxmodeled, axis = 'maxtemp')
+if __name__ == '__main__':
 
-ax = maxdifference.plot(kind='hist', alpha=0.5, title='difference between modeled and measured')
-mindifference.plot(ax=ax, kind='hist', alpha=0.5)
+    MODdiffmin, rcp45MOD = diffchecker('tasmin')
+    MODdiffmax, rcp45MOD = diffchecker('tasmax')
 
-'''now look at it by day of year, not overall date'''
-# strip out year
-mindifference['monthday'] = mindifference.index.map(lambda x: x[5:])
-# groups by day of year
-by_date = mindifference.groupby('monthday')
-# average difference between measured and modeled by day of year
-minbydate = by_date.mean()
+    '''load historically observed DCEW data'''
+    '''DCEW historical measured data'''
+    # loads in historical Treeline measured data that corrsponds with MACA
+    DCEW_files = glob.glob(os.path.join(os.pardir,
+                                        'Treeline\\Treeline_HrlySummary_*'))
+    # arrays to hold successive years worth of data
+    dcewOBSmin = []
+    dcewOBSmax = []
+    # loops through files 199-2005 (0-7), which have complete data
+    for i in range(7):
+        # reads in 1 year's hourly temp data
+        a = numpy.loadtxt(DCEW_files[i], delimiter=',', skiprows=20,
+                          usecols=[2])
+        # converts missing data to NaNs
+        a[a == -6999.0] = numpy.nan
+        # find daily min, append it to main array
+        dcewOBSmin = numpy.append(dcewOBSmin,
+                                  numpy.nanmin(a.reshape(-1, 24), axis=1))
+        # find daily max, apped it to main array
+        dcewOBSmax = numpy.append(dcewOBSmax,
+                                  numpy.nanmax(a.reshape(-1, 24), axis=1))
+    # convert those arrays to data frames for easier manipulation
+    # used the rcp45MOD array just to make date sorting easier
+    data = rcp45MOD[0:2557]
+    data = data.drop('rcp45', 1)
+    data['dcewOBSmin']=dcewOBSmin
+    data['dcewOBSmax']=dcewOBSmax
+    data['dcewMODmin']=numpy.nan
+    data['dcewMODmax']=numpy.nan
+                            
+    '''add difference between historical and forecasted MACA data to DCEW obs'''
+    for i in range(len(data)):
+        month = int(data.iloc[i,1]) - 1
+        data.loc[i,'dcewMODmin'] = MODdiffmin.iloc[month,0] + data.loc[i,'dcewOBSmin']
+        data.loc[i,'dcewMODmax'] = MODdiffmax.iloc[month,0] + data.loc[i,'dcewOBSmax']
 
-# strip out year
-maxdifference['monthday'] = maxdifference.index.map(lambda x: x[5:])
-# groups by day of year
-by_date = maxdifference.groupby('monthday')
-# average difference between measured and modeled by day of year
-maxbydate = by_date.mean()
+    # find mean
+    data['dcewMODmean'] = data[['dcewMODmin','dcewMODmax']].mean(axis=1)
 
-ax = maxbydate.plot(title='difference between modeled and measured')
-minbydate.plot(ax=ax)
-ax.set_ylabel('temp *C')
-ax.set_xlabel('day of year')
+    data.to_csv('MODTreelineDCEW.csv', float_format='%.2f')
+
+#    '''plot, just to check'''
+#    ax = data.dcewMODmin.plot(title='historical and modified DCEW data')
+#    data.dcewOBSmin.plot(ax=ax)
+#    ax.set_ylabel('temperature (*C)')
