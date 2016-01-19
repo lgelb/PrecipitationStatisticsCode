@@ -66,28 +66,38 @@ def diffchecker(variable):
     diff['diff'] = rcp45MODmonth['rcp45'] - histMODmonth['historical']
 
     '''plotting just to check'''
-    #ax = rcp45MODmonth.plot(title='monthly MACA ensemble averages (min temp)')
-    #histMODmonth.plot(ax=ax)
-    #diff.plot(ax=ax)
-    #ax.set_ylabel('temperature (*C)')
-    
+#    ax = rcp45MODmonth.plot(title='monthly MACA ensemble averages (min temp)')
+#    histMODmonth.plot(ax=ax)
+#    diff.plot(ax=ax)
+#    ax.set_ylabel('temperature (*C)')
+
     return diff, rcp45MOD
 
 if __name__ == '__main__':
 
+    '''finds average monthly difference between historic-al and forecasted
+    MACA data'''
     MODdiffmin, rcp45MOD = diffchecker('tasmin')
     MODdiffmax, rcp45MOD = diffchecker('tasmax')
+    # finds a average monthly difference to be applied to mean (very iffy?)
+    # concatenate them
+    df_concat = pandas.concat((MODdiffmin, MODdiffmax))
+    by_row_index = df_concat.groupby(df_concat.index)
+    MODdiffmean = by_row_index.mean()
 
     '''load historically observed DCEW data'''
-    '''DCEW historical measured data'''
     # loads in historical Treeline measured data that corrsponds with MACA
     DCEW_files = glob.glob(os.path.join(os.pardir,
                                         'Treeline\\Treeline_HrlySummary_*'))
+
+    ''' loops through files 1999-2005 (0-7), which have complete data, finds
+    their daily min and max, and appends those values to a single array for
+    all the years'''
     # arrays to hold successive years worth of data
     dcewOBSmin = []
     dcewOBSmax = []
-    # loops through files 199-2005 (0-7), which have complete data
-    for i in range(7):
+    dcewOBSmean = []
+    for i in range(16):
         # reads in 1 year's hourly temp data
         a = numpy.loadtxt(DCEW_files[i], delimiter=',', skiprows=20,
                           usecols=[2])
@@ -99,24 +109,43 @@ if __name__ == '__main__':
         # find daily max, apped it to main array
         dcewOBSmax = numpy.append(dcewOBSmax,
                                   numpy.nanmax(a.reshape(-1, 24), axis=1))
+        # find daily mean, apped it to main array
+        dcewOBSmean = numpy.append(dcewOBSmean,
+                                   numpy.nanmean(a.reshape(-1, 24), axis=1))
     # convert those arrays to data frames for easier manipulation
-    # used the rcp45MOD array just to make date sorting easier
-    data = rcp45MOD[0:2557]
+    # used the rcp45MOD array as index just to make date sorting easier
+    data = rcp45MOD[0:5844]
     data = data.drop('rcp45', 1)
-    data['dcewOBSmin']=dcewOBSmin
-    data['dcewOBSmax']=dcewOBSmax
-    data['dcewMODmin']=numpy.nan
-    data['dcewMODmax']=numpy.nan
-                            
-    '''add difference between historical and forecasted MACA data to DCEW obs'''
+    data['dcewOBSmin'] = dcewOBSmin
+    data['dcewOBSmax'] = dcewOBSmax
+    data['dcewOBSmean'] = dcewOBSmean
+    data['dcewMODincmin'] = numpy.nan
+    data['dcewMODincmax'] = numpy.nan
+    data['dcewMODincmean'] = numpy.nan
+    data['dcewMODdecmin'] = numpy.nan
+    data['dcewMODdecmax'] = numpy.nan
+    data['dcewMODdecmean'] = numpy.nan
+
+    '''add difference between hist and forecasted MACA data to DCEW obs'''
     for i in range(len(data)):
-        month = int(data.iloc[i,1]) - 1
-        data.loc[i,'dcewMODmin'] = MODdiffmin.iloc[month,0] + data.loc[i,'dcewOBSmin']
-        data.loc[i,'dcewMODmax'] = MODdiffmax.iloc[month,0] + data.loc[i,'dcewOBSmax']
+        month = int(data.iloc[i, 1]) - 1
+        data.loc[i, 'dcewMODincmin'] = (MODdiffmin.iloc[month, 0] +
+                                        data.loc[i, 'dcewOBSmin'])
+        data.loc[i, 'dcewMODincmax'] = (MODdiffmax.iloc[month, 0] +
+                                        data.loc[i, 'dcewOBSmax'])
+        data.loc[i, 'dcewMODincmean'] = (MODdiffmean.iloc[month, 0] +
+                                         data.loc[i, 'dcewOBSmean'])
+        data.loc[i, 'dcewMODdecmin'] = (data.loc[i, 'dcewOBSmin'] -
+                                           MODdiffmin.iloc[month, 0])
+        data.loc[i, 'dcewMODdecmax'] = (data.loc[i, 'dcewOBSmax'] -
+                                           MODdiffmax.iloc[month, 0])
+        data.loc[i, 'dcewMODdecmean'] = (data.loc[i, 'dcewOBSmean'] -
+                                            MODdiffmean.iloc[month, 0])
 
     # find mean
-    data['dcewMODmean'] = data[['dcewMODmin','dcewMODmax']].mean(axis=1)
+#    data['dcewMODmean'] = data[['dcewMODmin','dcewMODmax']].mean(axis=1)
 
+    # saves data
     data.to_csv('MODTreelineDCEW.csv', float_format='%.2f')
 
 #    '''plot, just to check'''
