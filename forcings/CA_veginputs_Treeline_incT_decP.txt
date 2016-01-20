@@ -55,18 +55,18 @@ ND:                     # Number of days in the year (days)
 365.
 
 MeanTmaxFwet_grass:        # Mean wet season rate of TmaxF (mm/d)
-1.86
+1.87
 MeanTmaxFwet_shrub:        # Mean wet season rate of TmaxF (mm/d)
-1.91
+1.92
 MeanTmaxFwet_tree:         # Mean wet season rate of TmaxF (mm/d)
-1.94
+1.96
 
 MeanTmaxFdry_grass:        # Mean dry season rate of TmaxF (mm/d)
-2.32
+2.50
 MeanTmaxFdry_shrub:        # Mean dry season rate of TmaxF (mm/d)
-2.40
+2.60
 MeanTmaxFdry_tree:         # Mean dry season rate of TmaxF (mm/d)
-2.45
+2.67
 
 # TmaxF - Estimated maximum evapotranspiration as a function of DOY using Penman Monteith method for historical weather
 

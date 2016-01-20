@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 19 16:27:33 2015
-
-@author: Lucy
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Tue Sep 22 12:17:47 2015
 This code takes in cleaned DCEW weather data and returns the PET value in
 mm/day for that area based on 4 different pfts (bare,grass,shrub,tree)
@@ -26,11 +19,12 @@ reliable.
 
 @author: lucyB570
 """
-import numpy, os, warnings
+import numpy
+import os
 import matplotlib.pyplot as plt
 
 
-def pftPET_(pft, albedo, usecolumns=[0,0,0]):
+def pftPET_(pft, albedo, usecolumns):
 
     # gets daily PET for all years
     for n in range(numyears):  # +1 exclusive
@@ -65,9 +59,9 @@ def pftPET_(pft, albedo, usecolumns=[0,0,0]):
     if saveyearlyPET:
         with open(os.path.join(stationstats['weatherstation'],
                                '{}.txt.'.format(runname)), 'a') as text_file:
-            text_file.write('\nPFT: {}\n'.format(pft))
-            text_file.write('wet season average = {:.3f}, '.format(totmeans[1]))
-            text_file.write('dry season average = {:.3f}\n'.format(totmeans[2]))
+            text_file.write('PFT: {}\n'.format(pft))
+            text_file.write('wet season average= {:.3f}, '.format(totmeans[1]))
+            text_file.write('dry season average= {:.3f}\n'.format(totmeans[2]))
 
 
 def calcPET_(filename, stationstats, n, a, usecolumns):
@@ -116,30 +110,21 @@ def calcPET_(filename, stationstats, n, a, usecolumns):
 #    tempU2 = FFT_(tempU2, 5) #only doing 1 year. WTF?
 
 #    # rolling mean (needs no reshape)
-#    tempU2 = rollingMedian_(windspeed, 24) # still get spikes, might be better if switch median for mean
+#    # still get spikes, might be better if switch median for mean
+#    tempU2 = rollingMedian_(windspeed, 24)
 
-    # if MACA data is being used, load min/mean/max temp and precip
     # no need to worry about precip data, since it's not a used variable
-    if useMACAdata:
-        startday = 365*n
-        # reads in all average daily temp values
-        csv = numpy.genfromtxt('MACAdata\\MODTreelineDCEW.csv', delimiter=",")
-        tempTmin  = csv[:, usecolumns[0]]
-        tempTmax  = csv[:, usecolumns[1]]
-        tempTmean = csv[:, usecolumns[2]]
-        # cuts it down to the needed years
-        tempTmin  = tempTmin[startday:startday+len(tempU2)]
-        tempTmax  = tempTmax[startday:startday+len(tempU2)]
-        tempTmean = tempTmean[startday:startday+len(tempU2)]
 
-    # else, use the weatherstation's measured temps
-    else:
-        # average daily temp
-        tempTmean = numpy.nanmean(temperatureC.reshape(-1, 24), axis=1)
-        # max daily temp
-        tempTmax = numpy.nanmax(temperatureC.reshape(-1, 24), axis=1)
-        # min daily temp
-        tempTmin = numpy.nanmin(temperatureC.reshape(-1, 24), axis=1)
+    startday = 365*n
+    # reads in all average daily temp values
+    csv = numpy.genfromtxt('MACAdata\\MODTreelineDCEW.csv', delimiter=",")
+    tempTmin = csv[:, usecolumns[0]]
+    tempTmax = csv[:, usecolumns[1]]
+    tempTmean = csv[:, usecolumns[2]]
+    # cuts it down to the needed years
+    tempTmin = tempTmin[startday:startday+len(tempU2)]
+    tempTmax = tempTmax[startday:startday+len(tempU2)]
+    tempTmean = tempTmean[startday:startday+len(tempU2)]
 
     # daily net radiation in MJ/m2/dayF
     tempRs = (numpy.nanmean(netradiation.reshape(-1, 24), axis=1))*0.0864
@@ -344,12 +329,7 @@ if __name__ == '__main__':
     stationstats = Treeline
     plotyearlyPET = False
     saveyearlyPET = True
-    useMACAdata = True
-    temperature = 'inc'  # increased or decreased temperature model scenario
-    # precipitation is not used in the calculation, so it doesn not need to be
-    # adjusted along with temperature
-
-    runname = 'PET_{}_T{}'.format(stationstats['weatherstation'], temperature)
+    useMACAdata = False
 
     # albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo = {'grass': 0.23, 'shrub': 0.14, 'tree': 0.08}  # 'bare':0.17
@@ -361,23 +341,26 @@ if __name__ == '__main__':
     numyears = stationstats['endyear']-stationstats['startyear']+1
     PET = numpy.empty((365, numyears,))
     PET[:] = numpy.NaN
+    columnsavg = [3, 4, 5]
+    columnsinc = [6, 7, 8]
+    columnsdec = [9, 10, 11]
 
     if useMACAdata:
-        columnsinc = [5, 6, 7]
-        columnsdec = [8, 9, 10]
+        runname = 'PET_{}_mod'.format(stationstats['weatherstation'])
         # finds PET for all pft albedo values (4)
         with open(os.path.join(stationstats['weatherstation'],
                   '{}.txt.'.format(runname)), 'a') as text_file:
-            text_file.write('DCEW values increased by MACA\n')
+            text_file.write('\nDCEW values increased by MACA\n')
         for k, v in pftAlbedo.items():
             pftPET_(k, v, columnsinc)
         # finds PET for all pft albedo values (4)
         with open(os.path.join(stationstats['weatherstation'],
                   '{}.txt.'.format(runname)), 'a') as text_file:
-            text_file.write('DCEW values decreased by MACA\n')
+            text_file.write('\nDCEW values decreased by MACA\n')
         for k, v in pftAlbedo.items():
             pftPET_(k, v, columnsdec)
     else:
+        runname = 'PET_{}_obs'.format(stationstats['weatherstation'])
         # finds PET for all pft albedo values (4)
         for k, v in pftAlbedo.items():
-            pftPET_(k, v)
+            pftPET_(k, v, columnsavg)

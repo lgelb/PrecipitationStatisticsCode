@@ -1,0 +1,16 @@
+
+DCEW values increased by MACA
+PFT: grass
+wet season average= 1.686, dry season average= 2.201
+PFT: shrub
+wet season average= 1.736, dry season average= 2.289
+PFT: tree
+wet season average= 1.766, dry season average= 2.348
+
+DCEW values decreased by MACA
+PFT: grass
+wet season average= 1.871, dry season average= 2.498
+PFT: shrub
+wet season average= 1.924, dry season average= 2.598
+PFT: tree
+wet season average= 1.959, dry season average= 2.665
