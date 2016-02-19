@@ -75,7 +75,7 @@ def diffchecker(variable):
 
 if __name__ == '__main__':
 
-    '''finds average monthly difference between historic-al and forecasted
+    '''finds average monthly difference between historical and forecasted
     MACA data'''
     MODdiffmin, rcp45MOD = diffchecker('tasmin')
     MODdiffmax, rcp45MOD = diffchecker('tasmax')

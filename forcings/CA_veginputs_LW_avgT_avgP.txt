@@ -66,7 +66,7 @@ MeanTmaxFdry_grass:        # Mean dry season rate of TmaxF (mm/d)
 MeanTmaxFdry_shrub:        # Mean dry season rate of TmaxF (mm/d)
 2.99
 MeanTmaxFdry_tree:         # Mean dry season rate of TmaxF (mm/d)
-3.30
+3.04
 
 # TmaxF - Estimated maximum evapotranspiration as a function of DOY using Penman Monteith method for historical weather
 

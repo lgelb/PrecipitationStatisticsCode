@@ -326,8 +326,8 @@ if __name__ == '__main__':
 
     '''something funny with scr data'''
 
-    stationstats = Treeline
-    plotyearlyPET = False
+    stationstats = SCR
+    plotyearlyPET = True
     saveyearlyPET = True
     useMACAdata = False
 
@@ -359,7 +359,7 @@ if __name__ == '__main__':
             text_file.write('\nDCEW values decreased by MACA\n')
         for k, v in pftAlbedo.items():
             pftPET_(k, v, columnsdec)
-    else:
+    else:  # THIS DOESN'T WORK?
         runname = 'PET_{}_obs'.format(stationstats['weatherstation'])
         # finds PET for all pft albedo values (4)
         for k, v in pftAlbedo.items():

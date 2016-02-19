@@ -329,7 +329,7 @@ if __name__ == '__main__':
 
     '''something funny with scr data'''
 
-    stationstats = BRW
+    stationstats = LowerWeather
     plotyearlyPET = True
     saveyearlyPET = True
 
