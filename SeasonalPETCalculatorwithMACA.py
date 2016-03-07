@@ -117,7 +117,7 @@ def calcPET_(filename, stationstats, n, a, usecolumns):
 
     startday = 365*n
     # reads in all average daily temp values
-    csv = numpy.genfromtxt('MACAdata\\MODTreelineDCEW.csv', delimiter=",")
+    csv = numpy.genfromtxt('MACAdata\\MOD85TreelineDCEW.csv', delimiter=",")
     tempTmin = csv[:, usecolumns[0]]
     tempTmax = csv[:, usecolumns[1]]
     tempTmean = csv[:, usecolumns[2]]
@@ -326,10 +326,10 @@ if __name__ == '__main__':
 
     '''something funny with scr data'''
 
-    stationstats = SCR
+    stationstats = Treeline
     plotyearlyPET = True
     saveyearlyPET = True
-    useMACAdata = False
+    useMACAdata = True
 
     # albedo values are for summer, snow-off, tree=conifer, shrub=sagebrush
     pftAlbedo = {'grass': 0.23, 'shrub': 0.14, 'tree': 0.08}  # 'bare':0.17
@@ -344,9 +344,10 @@ if __name__ == '__main__':
     columnsavg = [3, 4, 5]
     columnsinc = [6, 7, 8]
     columnsdec = [9, 10, 11]
-
+    
+    '''change the following 'runname' name, and check line 120 is correct'''
     if useMACAdata:
-        runname = 'PET_{}_mod'.format(stationstats['weatherstation'])
+        runname = 'PET_{}_mod85'.format(stationstats['weatherstation'])
         # finds PET for all pft albedo values (4)
         with open(os.path.join(stationstats['weatherstation'],
                   '{}.txt.'.format(runname)), 'a') as text_file:
