@@ -152,6 +152,7 @@ if __name__ == '__main__':
     # find mean
 #    data['dcewMODmean'] = data[['dcewMODmin','dcewMODmax']].mean(axis=1)
 
+    # saves data
 #    data.to_csv('MOD45TreelineDCEW.csv', float_format='%.2f')
 #
 #    '''plot, just to check'''
