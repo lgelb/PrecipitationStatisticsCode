@@ -21,6 +21,8 @@ to use:
     data is not included for the calender year (common if a datalogger
     was installed in the spring)
     4)change txtfile.write to have correct notes in the output file
+    
+    make sure you have the python tabulate module installed
 
 flaws:
     -this code does not deal with storms overlapping seasons
@@ -33,7 +35,7 @@ flaws:
 
 #from numpy import loadtxt
 import numpy,pylab,os
-from tabulate import tabulate
+#from tabulate import tabulate
 import matplotlib.pyplot as plt
 
 LowerWeather={'weatherstation':'LowerWeather','startyear':1999,'endyear':2014,'z':1120,'latitude':43.6892464,'longitude':-116.1696892}
@@ -60,6 +62,8 @@ w_stormlength=[];w_stormdepth=[];w_interstorm=[];w_stormcount=0
 d_stormlength=[];d_stormdepth=[];d_interstorm=[];d_stormcount=0
 numyears=endyear-startyear #finds the number of years the simulation is run
 
+totalPrecip = []
+
 #initialized precip figure
 cm = plt.get_cmap('winter')
 plt.figure()
@@ -72,7 +76,7 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     #precipHourly=loadtxt(filename, comments="#", delimiter="    ", unpack=False) #loads in the hourly precip data
     filename = os.path.join(weatherstation['weatherstation'], \
                         "{}_HrlySummary_{}.csv".format(weatherstation['weatherstation'],n))
-    print "Calculating {}...".format(n)
+    print("Calculating {}...".format(n))
     #reads in one year's precip data, skipping 20 header rows,\
     precipHourly= numpy.loadtxt(filename,delimiter=",", \
         usecols=[1],skiprows=20,unpack=True)
@@ -85,6 +89,9 @@ for n in range(startyear,(endyear+1)): #+1 exclusive
     templength=0
     tempdepth=0
     tempinterstorm=0
+
+    #finds total yearly precip
+    totalPrecip.append(max(precipHourly))
 
     #plots this year's precip
     ax.plot(precipHourly, label=n)
@@ -156,6 +163,20 @@ pylab.title('hourly {} precipitation'.format(weatherstation['weatherstation']))
 pylab.savefig(os.path.join(weatherstation['weatherstation'],'Precip_{}.svg'.format(\
                     weatherstation['weatherstation'])), bbox_inches="tight",format='svg')
 
+'''saves raw numbers'''
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_wStormLength.csv".format(
+                    weatherstation['weatherstation'])), w_stormlength, delimiter=",")
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_wInterstorm.csv".format(
+                    weatherstation['weatherstation'])), w_interstorm, delimiter=",")
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_wStormDepth.csv".format(
+                    weatherstation['weatherstation'])), w_stormdepth, delimiter=",")
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_dStormLength.csv".format(
+                    weatherstation['weatherstation'])), d_stormlength, delimiter=",")
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_dInterstorm.csv".format(
+                    weatherstation['weatherstation'])), d_interstorm, delimiter=",")
+numpy.savetxt(os.path.join(weatherstation['weatherstation'], "{}_Raw_dStormDepth.csv".format(
+                    weatherstation['weatherstation'])), d_stormdepth, delimiter=",")
+
 #wetseason statistics
 w_mustormlength = numpy.nanmean(w_stormlength)
 w_mustormdepth = numpy.nanmean(w_stormdepth)
@@ -174,6 +195,9 @@ y_mustormdepth = numpy.nanmean(w_stormdepth+d_stormdepth)
 y_muinterstorm = numpy.nanmean(w_interstorm+d_interstorm)
 y_mustormcount = (w_stormcount+d_stormcount)/numyears
 
+# find yearly average precipitation (mm)
+averagePrecip = numpy.nanmean(totalPrecip)
+
 #create a table for easy formatting of output
 t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format( \
                     w_muinterstorm,w_muinterstorm/24),"{0:.2f}".format( \
@@ -186,12 +210,12 @@ t=[["wet season","{0:.2f}".format(w_mustormlength),"{0:.2f}/{1:.2f}".format( \
                     y_muinterstorm/24),"{0:.2f}".format(y_mustormdepth), \
                     "{0:.2f}".format(y_mustormcount)]]
 h=[" ","S (hrs)","IS (hrs/days)","D (mm)",'num S']
-out= tabulate(t,h)
+#out= tabulate(t,h)
 
-#write findings to a file
-with open(os.path.join(weatherstation['weatherstation'],"Precip_{}.txt".format( \
-                    weatherstation['weatherstation'])), "w") as text_file:
-    text_file.write("Calculated {} averages using years {} to {} \n".format( \
-                    weatherstation['weatherstation'],startyear,endyear))
-    text_file.write(out)
-print out
+##write findings to a file
+#with open(os.path.join(weatherstation['weatherstation'],"Precip_{}.txt".format( \
+#                    weatherstation['weatherstation'])), "w") as text_file:
+#    text_file.write("Calculated {} averages using years {} to {} \n".format( \
+#                    weatherstation['weatherstation'],startyear,endyear))
+#    text_file.write(out)
+#print out

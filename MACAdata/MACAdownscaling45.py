@@ -42,43 +42,43 @@ def diffchecker(variable):
 
     '''MACA modeled forcasting data'''
     # creates a list of all available model csvs'
-    files = glob.glob('RCP85\\agg_macav2metdata_{}_*'.format(variable))
-    rcp85MOD = pandas.DataFrame()
+    files = glob.glob('RCP45\\agg_macav2metdata_{}_*'.format(variable))
+    rcp45MOD = pandas.DataFrame()
     for i, elem in enumerate(files):
         # reads in one model's data for 100 years
-        df = pandas.read_csv(files[i], names=['doy', 'rcp85'],
+        df = pandas.read_csv(files[i], names=['doy', 'rcp45'],
                              sep=",", skiprows=8)
         # deletes data so only use 1999-2005
         df = df[df.doy > '1998-12-31']
         # converts from kelvin to celcius
-        df['rcp85'] = df['rcp85']-273.15
+        df['rcp45'] = df['rcp45']-273.15
         # adds data to main dataframe
-        rcp85MOD = rcp85MOD.append(df)
+        rcp45MOD = rcp45MOD.append(df)
     # strip out year
-    rcp85MOD['month'] = rcp85MOD['doy'].map(lambda x: x[5:7])
+    rcp45MOD['month'] = rcp45MOD['doy'].map(lambda x: x[5:7])
     # group by month
-    by_doy = rcp85MOD.groupby('month')
+    by_doy = rcp45MOD.groupby('month')
     # average data value by month
-    rcp85MODmonth = by_doy.mean()
+    rcp45MODmonth = by_doy.mean()
 
     '''difference between the two'''
     diff = pandas.DataFrame()
-    diff['diff'] = rcp85MODmonth['rcp85'] - histMODmonth['historical']
+    diff['diff'] = rcp45MODmonth['rcp45'] - histMODmonth['historical']
 
     '''plotting just to check'''
-#    ax = rcp85MODmonth.plot(title='monthly MACA ensemble averages (min temp)')
+#    ax = rcp45MODmonth.plot(title='monthly MACA ensemble averages (min temp)')
 #    histMODmonth.plot(ax=ax)
 #    diff.plot(ax=ax)
 #    ax.set_ylabel('temperature (*C)')
 
-    return diff, rcp85MOD
+    return diff, rcp45MOD
 
 if __name__ == '__main__':
 
     '''finds average monthly difference between historical and forecasted
     MACA data'''
-    MODdiffmin, rcp85MOD = diffchecker('tasmin')
-    MODdiffmax, rcp85MOD = diffchecker('tasmax')
+    MODdiffmin, rcp45MOD = diffchecker('tasmin')
+    MODdiffmax, rcp45MOD = diffchecker('tasmax')
     # finds a average monthly difference to be applied to mean (very iffy?)
     # concatenate them
     df_concat = pandas.concat((MODdiffmin, MODdiffmax))
@@ -113,9 +113,9 @@ if __name__ == '__main__':
         dcewOBSmean = numpy.append(dcewOBSmean,
                                    numpy.nanmean(a.reshape(-1, 24), axis=1))
     # convert those arrays to data frames for easier manipulation
-    # used the rcp85MOD array as index just to make date sorting easier
-    data = rcp85MOD[0:5844]
-    data = data.drop('rcp85', 1)
+    # used the rcp45MOD array as index just to make date sorting easier
+    data = rcp45MOD[0:5844]
+    data = data.drop('rcp45', 1)
     data['dcewOBSmin'] = dcewOBSmin
     data['dcewOBSmax'] = dcewOBSmax
     data['dcewOBSmean'] = dcewOBSmean
@@ -146,14 +146,13 @@ if __name__ == '__main__':
     data['dcew%changemin']=data['dcewMODincmin']/data['dcewOBSmin']
     data['dcew%changemax']=data['dcewMODincmax']/data['dcewOBSmax']
     data['dcew%changemean']=data['dcewMODincmean']/data['dcewOBSmean']
-    data.replace([numpy.inf, -numpy.inf], numpy.nan)
+    data = data.replace([numpy.inf, -numpy.inf], numpy.nan)
     data.mean()
 
     # find mean
 #    data['dcewMODmean'] = data[['dcewMODmin','dcewMODmax']].mean(axis=1)
 
-    # saves data
-#    data.to_csv('MOD85TreelineDCEW.csv', float_format='%.2f')
+#    data.to_csv('MOD45TreelineDCEW.csv', float_format='%.2f')
 #
 #    '''plot, just to check'''
 #    ax = data.dcewMODincmin.plot(title='historical and modified DCEW data')
